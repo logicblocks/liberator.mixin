@@ -37,12 +37,3 @@
      (hal/add-properties
        (hal/new-resource)
        {:error not-found-message}))})
-
-(defn hal-resource-handler-for [{:keys [routes]} & {:as overrides}]
-  (liberator/build-resource
-    (with-hal-media-type)
-    (json-resources/with-body-parsed-as-json)
-    (with-not-found-handler)
-    (with-routes-in-context routes)
-    overrides))
-
