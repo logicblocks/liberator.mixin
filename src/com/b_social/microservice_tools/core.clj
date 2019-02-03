@@ -1,4 +1,4 @@
-(ns microservice-tools.core
+(ns com.b-social.microservice-tools.core
   (:require
     [liberator.representation
      :refer [render-map-generic

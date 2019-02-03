@@ -1,4 +1,4 @@
-(ns microservice-tools.core-test
+(ns com.b-social.microservice-tools.core-test
   (:require [clojure.test :refer :all]
             [microservice-tools.core :refer :all]))
 

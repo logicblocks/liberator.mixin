@@ -1,4 +1,4 @@
-(ns microservice-tools.liberator
+(ns com.b-social.microservice-tools.liberator
   (:require
     [clojure.string :as str]
     [liberator.core :as liberator]

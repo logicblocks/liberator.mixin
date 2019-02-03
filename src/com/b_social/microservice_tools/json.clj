@@ -1,4 +1,4 @@
-(ns microservice-tools.json
+(ns com.b-social.microservice-tools.json
   (:require
     [clojure.string :refer [starts-with?]]
     [clj-time.coerce :as time-coerce]

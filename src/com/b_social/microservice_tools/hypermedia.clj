@@ -1,4 +1,4 @@
-(ns microservice-tools.hypermedia
+(ns com.b-social.microservice-tools.hypermedia
   (:require
     [bidi.bidi :refer [path-for]]
     [clojure.string :as str]))
