@@ -4,10 +4,9 @@
     [clojure.string :as str]))
 
 (defn base-url [request]
-  (str
-    (-> request :scheme name)
-    "://"
-    (get-in request [:headers "host"])))
+  (let [scheme (-> request :scheme name)
+        host (get-in request [:headers "host"])]
+    (format "%s://%s" scheme host)))
 
 (defn absolute-url-for
   [request routes handler & args]
