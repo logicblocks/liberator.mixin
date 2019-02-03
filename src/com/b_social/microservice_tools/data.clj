@@ -2,4 +2,4 @@
   (:import [java.util UUID]))
 
 (defn random-uuid []
-  (UUID/randomUUID))
+  (str (UUID/randomUUID)))
