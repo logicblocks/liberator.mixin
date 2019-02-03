@@ -8,6 +8,7 @@
   (liberator/build-resource
     (h/with-hal-media-type)
     (j/with-body-parsed-as-json)
+    (h/with-self-link)
     (h/with-not-found-handler)
     (h/with-routes-in-context routes)
     overrides))

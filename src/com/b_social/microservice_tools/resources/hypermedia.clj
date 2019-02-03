@@ -4,9 +4,7 @@
     [halboy.json :as hal-json]
     [liberator.representation :as r]
     [com.b-social.microservice-tools.urls :as urls]
-    [com.b-social.microservice-tools.json :as json]
-    [com.b-social.microservice-tools.liberator :as liberator]
-    [com.b-social.microservice-tools.resources.json :as json-resources]))
+    [com.b-social.microservice-tools.json :as json]))
 
 (def hal-media-type "application/hal+json")
 
@@ -29,6 +27,12 @@
 
 (defn with-routes-in-context [routes]
   {:initialize-context (fn [_] {:routes routes})})
+
+(defn with-self-link []
+  {:initialize-context
+   (fn [{:keys [resource] :as context}]
+     (when-let [get-self-link (:self resource)]
+       {:self (get-self-link context)}))})
 
 (defn with-not-found-handler []
   {:handle-not-found

@@ -38,6 +38,25 @@
         (is (= {:status "OK"}
               (:body response))))))
 
+  (testing "with-self-link"
+    (testing "adds a self link to context"
+      (let [self-link "https://self.example.com"
+            resource (l/build-resource
+                       (r/with-hal-media-type)
+                       (r/with-self-link)
+                       {:self (constantly self-link)
+                        :handle-ok
+                              (fn [{:keys [self]}]
+                                {:self self})})
+            response (call-resource
+                       resource
+                       (ring/header
+                         (ring/request :get "/")
+                         :accept r/hal-media-type))]
+        (is (=
+              self-link
+              (get-in response [:body :self]))))))
+
   (testing "with-not-found-handler"
     (testing "provides a sensible default when the resource does not exist"
       (let [resource (l/build-resource
