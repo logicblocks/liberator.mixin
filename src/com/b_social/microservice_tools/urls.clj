@@ -17,6 +17,7 @@
 
 (defn parameterised-url-for
   [request routes handler parameter-names & args]
-  (str
-    (apply absolute-url-for request routes handler args)
-    (str "{?" (str/join "," parameter-names) "}")))
+  (let [parameter-names (map name parameter-names)]
+    (str
+      (apply absolute-url-for request routes handler args)
+      (str "{?" (str/join "," parameter-names) "}"))))
