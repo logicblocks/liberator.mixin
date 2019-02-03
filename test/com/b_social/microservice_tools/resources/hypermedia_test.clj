@@ -10,7 +10,7 @@
     (resource request)
     (update :body json/wire-json->map)))
 
-(deftest resources
+(deftest hypermedia-mixins
   (testing "with-routes-in-context"
     (testing "adds routes to the context"
       (let [routes [["/" :root]]

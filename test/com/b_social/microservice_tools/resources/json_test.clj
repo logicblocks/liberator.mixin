@@ -10,7 +10,7 @@
     (resource request)
     (update :body json/wire-json->map)))
 
-(deftest resources
+(deftest json-mixins
   (testing "with-json-media-type"
     (testing "allows hypermedia requests"
       (let [resource (l/build-resource
