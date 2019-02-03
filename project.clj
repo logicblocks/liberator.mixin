@@ -1,8 +1,7 @@
 (defproject com.b-social/microservice-tools "0.0.1"
   :description "A collection of sensible defaults for liberator microservices"
   :url "https://github.com/b-social/microservice-tools"
-  :license {:name "Eclipse Public License"
-            :url  "http://www.eclipse.org/legal/epl-v10.html"}
+  :license "Proprietary"
   :dependencies [[cheshire "5.8.1"]
                  [liberator "0.15.2"]
                  [halboy "4.0.1"]
