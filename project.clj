@@ -1,4 +1,4 @@
-(defproject microservice-tools "0.0.1"
+(defproject com.b-social/microservice-tools "0.0.1"
   :description "A collection of sensible defaults for liberator microservices"
   :url "https://github.com/b-social/microservice-tools"
   :license {:name "Eclipse Public License"
