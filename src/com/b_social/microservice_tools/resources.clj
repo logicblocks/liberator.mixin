@@ -1,22 +1,15 @@
-(ns com.b-social.microservice-tools.core
+(ns com.b-social.microservice-tools.resources
   (:require
-    [liberator.representation
-     :refer [render-map-generic
-             as-response
-             Representation]]
-
     [halboy.resource :as hal]
-
-    [microservice-tools.hypermedia
-     :refer [absolute-url-for]]
-    [microservice-tools.liberator :as liberator]
-    [microservice-tools.json
-     :refer [wire-json->map
-             map->wire-json]]
-    [clojure.string
-     :refer [upper-case starts-with?]])
+    [halboy.json :as hal-json]
+    [liberator.representation :as r]
+    [com.b-social.microservice-tools.urls :as urls]
+    [com.b-social.microservice-tools.json :as json]
+    [com.b-social.microservice-tools.liberator :as liberator])
   (:import [com.fasterxml.jackson.core JsonParseException]))
 
+(def json-media-type "application/json")
+(def hal-media-type "application/hal+json")
 
 (defn- json-request? [request]
   (if-let [type (get-in request [:headers "content-type"])]
@@ -27,15 +20,26 @@
     (if-let [body (:body request)]
       (let [body-string (slurp body)]
         (try
-          [true (wire-json->map body-string)]
+          [true (json/wire-json->map body-string)]
           (catch JsonParseException ex
             [false nil]))))))
 
+(extend-protocol r/Representation
+  halboy.resource.Resource
+  (as-response [data {:keys [request routes] :as context}]
+    (r/as-response
+      (-> data
+        (hal/add-link
+          :discovery
+          {:href (urls/absolute-url-for request routes :discovery)})
+        (hal-json/resource->map))
+      context)))
 
-(def hal-media-type "application/hal+json")
+(defmethod r/render-map-generic hal-media-type [data _]
+  (json/map->wire-json data))
 
-(defmethod render-map-generic hal-media-type [data _]
-  (map->wire-json data))
+(defn with-json-media-type []
+  {:available-media-types [json-media-type]})
 
 (defn with-hal-media-type []
   {:available-media-types [hal-media-type]})
