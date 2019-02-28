@@ -36,7 +36,7 @@
      (when-let [get-self-link (:self resource)]
        {:self (get-self-link context)}))})
 
-(defn with-exception-handling []
+(defn with-exception-handler []
   {:handle-exception
    (fn [{:keys [exception resource]}]
      (let [error-id (data/random-uuid)

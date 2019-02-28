@@ -89,7 +89,7 @@
     (let [log-state-atom (atom {})
           resource (l/build-resource
                      (r/with-hal-media-type)
-                     (r/with-exception-handling)
+                     (r/with-exception-handler)
                      {:logger
                       (constantly (new-test-logger log-state-atom))
                       :handle-ok
