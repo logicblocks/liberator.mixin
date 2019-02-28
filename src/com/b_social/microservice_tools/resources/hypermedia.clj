@@ -4,7 +4,9 @@
     [halboy.json :as hal-json]
     [liberator.representation :as r]
     [com.b-social.microservice-tools.urls :as urls]
-    [com.b-social.microservice-tools.json :as json]))
+    [com.b-social.microservice-tools.json :as json]
+    [com.b-social.microservice-tools.resources.logging :as log]
+    [com.b-social.microservice-tools.data :as data]))
 
 (def hal-media-type "application/hal+json")
 
@@ -33,6 +35,23 @@
    (fn [{:keys [resource] :as context}]
      (when-let [get-self-link (:self resource)]
        {:self (get-self-link context)}))})
+
+(defn with-exception-handling []
+  {:handle-exception
+   (fn [{:keys [exception resource]}]
+     (let [error-id (data/random-uuid)
+           message "Request caused an exception"]
+       (do
+         (when-let [get-logger (:logger resource)]
+           (log/log-error
+             (get-logger)
+             message
+             {:error-id error-id}
+             exception))
+         (hal/add-properties
+           (hal/new-resource)
+           {:error-id error-id
+            :message  message}))))})
 
 (defn with-not-found-handler []
   {:handle-not-found

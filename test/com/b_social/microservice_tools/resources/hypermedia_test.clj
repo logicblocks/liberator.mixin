@@ -3,7 +3,20 @@
             [ring.mock.request :as ring]
             [com.b-social.microservice-tools.json :as json]
             [com.b-social.microservice-tools.liberator :as l]
+            [com.b-social.microservice-tools.resources.logging :as log]
             [com.b-social.microservice-tools.resources.hypermedia :as r]))
+
+(deftype TestLogger [state]
+  log/Logger
+  (log-error [_ message context cause]
+    (reset!
+      state
+      {:message message
+       :context context
+       :cause   cause})))
+
+(defn new-test-logger [state]
+  (->TestLogger state))
 
 (defn call-resource [resource request]
   (->
@@ -70,4 +83,31 @@
                          :accept r/hal-media-type))]
         (is (= 404 (:status response)))
         (is (= "Resource not found"
-              (get-in response [:body :error])))))))
+              (get-in response [:body :error]))))))
+
+  (testing "with-exception-handler"
+    (let [log-state-atom (atom {})
+          resource (l/build-resource
+                     (r/with-hal-media-type)
+                     (r/with-exception-handling)
+                     {:logger
+                      (constantly (new-test-logger log-state-atom))
+                      :handle-ok
+                      #(throw (ex-info "Something went wrong" {}))})
+          response (call-resource
+                     resource
+                     (ring/header
+                       (ring/request :get "/")
+                       :accept r/hal-media-type))]
+      (testing "returns a json response when an exception is thrown"
+        (is (= 500 (:status response)))
+        (is (some? (get-in response [:body :error-id])))
+        (is (= "Request caused an exception"
+              (get-in response [:body :message]))))
+
+      (testing "calls the logger when present"
+        (let [log-state @log-state-atom]
+          (is (= "Request caused an exception"
+                (:message log-state)))
+          (is (some? (:context log-state)))
+          (is (some? (:cause log-state))))))))
