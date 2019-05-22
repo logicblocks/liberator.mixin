@@ -1,8 +1,11 @@
-(ns com.b-social.microservice-tools.resources.validation
-  (:require [halboy.resource :as hal]
-            [liberator.util :refer [by-method]]
-            [com.b-social.microservice-tools.data :as data]
-            [com.b-social.microservice-tools.validation :as v]))
+(ns liberator-mixin.resources.validation
+  (:require
+    [halboy.resource :as hal]
+
+    [liberator.util :refer [by-method]]
+
+    [liberator-mixin.data :as data]
+    [liberator-mixin.validation :as v]))
 
 (defn on-write [f default]
   (by-method

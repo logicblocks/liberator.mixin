@@ -1,7 +1,8 @@
-(ns com.b-social.microservice-tools.urls
+(ns liberator-mixin.urls
   (:require
-    [bidi.bidi :refer [path-for]]
-    [clojure.string :as str]))
+    [clojure.string :as str]
+
+    [bidi.bidi :refer [path-for]]))
 
 (defn base-url [request]
   (let [scheme (-> request :scheme name)

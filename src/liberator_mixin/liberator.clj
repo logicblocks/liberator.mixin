@@ -1,9 +1,9 @@
-(ns com.b-social.microservice-tools.liberator
+(ns liberator-mixin.liberator
   (:require
     [clojure.string :as str]
+
     [liberator.core :as liberator]
-    [liberator.util
-     :refer [make-function]]))
+    [liberator.util :refer [make-function]]))
 
 (defn is-decision? [k]
   (str/ends-with? (name k) "?"))

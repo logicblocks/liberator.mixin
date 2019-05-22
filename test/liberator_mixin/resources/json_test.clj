@@ -1,9 +1,9 @@
-(ns com.b-social.microservice-tools.resources.json-test
+(ns liberator-mixin.resources.json-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as ring]
-            [com.b-social.microservice-tools.json :as json]
-            [com.b-social.microservice-tools.liberator :as l]
-            [com.b-social.microservice-tools.resources.json :as r]))
+            [liberator-mixin.json :as json]
+            [liberator-mixin.liberator :as l]
+            [liberator-mixin.resources.json :as r]))
 
 (defn call-resource [resource request]
   (->

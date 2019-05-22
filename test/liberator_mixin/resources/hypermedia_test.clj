@@ -1,10 +1,10 @@
-(ns com.b-social.microservice-tools.resources.hypermedia-test
+(ns liberator-mixin.resources.hypermedia-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as ring]
-            [com.b-social.microservice-tools.json :as json]
-            [com.b-social.microservice-tools.liberator :as l]
-            [com.b-social.microservice-tools.resources.logging :as log]
-            [com.b-social.microservice-tools.resources.hypermedia :as r]))
+            [liberator-mixin.json :as json]
+            [liberator-mixin.liberator :as l]
+            [liberator-mixin.resources.logging :as log]
+            [liberator-mixin.resources.hypermedia :as r]))
 
 (deftype TestLogger [state]
   log/Logger

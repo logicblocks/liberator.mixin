@@ -1,6 +1,6 @@
-(ns com.b-social.microservice-tools.urls-test
+(ns liberator-mixin.urls-test
   (:require [clojure.test :refer :all]
-            [com.b-social.microservice-tools.urls :refer :all]))
+            [liberator-mixin.urls :refer :all]))
 
 (deftest urls
   (testing "base-url"

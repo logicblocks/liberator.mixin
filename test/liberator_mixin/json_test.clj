@@ -1,8 +1,8 @@
-(ns com.b-social.microservice-tools.json-test
+(ns liberator-mixin.json-test
   (:require [clojure.test :refer :all]
             [clojure.string :as str]
             [clj-time.core :as date]
-            [com.b-social.microservice-tools.json :refer :all]))
+            [liberator-mixin.json :refer :all]))
 
 (defn- long-str [& args]
   (str/join "\n" args))

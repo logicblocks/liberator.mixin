@@ -1,12 +1,12 @@
-(ns com.b-social.microservice-tools.resources.validation-test
+(ns liberator-mixin.resources.validation-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as ring]
-            [com.b-social.microservice-tools.json :as json]
-            [com.b-social.microservice-tools.validation :as validation]
-            [com.b-social.microservice-tools.liberator :as l]
-            [com.b-social.microservice-tools.resources.hypermedia :as r]
-            [com.b-social.microservice-tools.resources.validation :as v]
-            [com.b-social.microservice-tools.resources.json :as j]))
+            [liberator-mixin.json :as json]
+            [liberator-mixin.validation :as validation]
+            [liberator-mixin.liberator :as l]
+            [liberator-mixin.resources.hypermedia :as r]
+            [liberator-mixin.resources.validation :as v]
+            [liberator-mixin.resources.json :as j]))
 
 (defn call-resource [resource request]
   (->

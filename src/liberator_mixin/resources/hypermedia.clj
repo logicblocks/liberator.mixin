@@ -1,12 +1,14 @@
-(ns com.b-social.microservice-tools.resources.hypermedia
+(ns liberator-mixin.resources.hypermedia
   (:require
     [halboy.resource :as hal]
     [halboy.json :as hal-json]
+
     [liberator.representation :as r]
-    [com.b-social.microservice-tools.urls :as urls]
-    [com.b-social.microservice-tools.json :as json]
-    [com.b-social.microservice-tools.resources.logging :as log]
-    [com.b-social.microservice-tools.data :as data]))
+
+    [liberator-mixin.urls :as urls]
+    [liberator-mixin.json :as json]
+    [liberator-mixin.resources.logging :as log]
+    [liberator-mixin.data :as data]))
 
 (def hal-media-type "application/hal+json")
 

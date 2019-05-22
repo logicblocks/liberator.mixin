@@ -1,5 +1,5 @@
-(ns com.b-social.microservice-tools.resources.json
-  (:require [com.b-social.microservice-tools.json :as json])
+(ns liberator-mixin.resources.json
+  (:require [liberator-mixin.json :as json])
   (:import [com.fasterxml.jackson.core JsonParseException]))
 
 (defn- json-request? [request]

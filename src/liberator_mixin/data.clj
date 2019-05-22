@@ -1,4 +1,4 @@
-(ns com.b-social.microservice-tools.data
+(ns liberator-mixin.data
   (:import [java.util UUID]))
 
 (defn random-uuid []

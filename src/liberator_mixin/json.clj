@@ -1,9 +1,12 @@
-(ns com.b-social.microservice-tools.json
+(ns liberator-mixin.json
   (:require
     [clojure.string :refer [starts-with?]]
+
     [clj-time.coerce :as time-coerce]
+
     [cheshire.core :as json]
     [cheshire.generate :refer [add-encoder]]
+
     [camel-snake-kebab.core
      :refer [->camelCaseString
              ->snake_case_string

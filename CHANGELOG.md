@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 Released without _CHANGELOG.md_.
 
 
-[0.0.4]: https://github.com/b-social/microservice-tools/compare/0.0.4...0.0.4
-[0.0.5]: https://github.com/b-social/microservice-tools/compare/0.0.4...0.0.5
-[0.0.6]: https://github.com/b-social/microservice-tools/compare/0.0.5...0.0.6
-[Unreleased]: https://github.com/b-social/microservice-tools/compare/0.0.6...HEAD
+[0.0.4]: https://github.com/b-social/liberator-mixin/compare/0.0.4...0.0.4
+[0.0.5]: https://github.com/b-social/liberator-mixin/compare/0.0.4...0.0.5
+[0.0.6]: https://github.com/b-social/liberator-mixin/compare/0.0.5...0.0.6
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.6...HEAD
