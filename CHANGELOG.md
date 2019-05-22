@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.5] — 2019-05-22
+
 ## [0.0.4] — 2019-05-22
 ### Added
 - _CHANGELOG.md_ created.
@@ -23,4 +25,5 @@ Released without _CHANGELOG.md_.
 
 
 [0.0.4]: https://github.com/b-social/microservice-tools/compare/0.0.4...0.0.4
-[Unreleased]: https://github.com/b-social/microservice-tools/compare/0.0.4...HEAD
+[0.0.5]: https://github.com/b-social/microservice-tools/compare/0.0.4...0.0.5
+[Unreleased]: https://github.com/b-social/microservice-tools/compare/0.0.5...HEAD
