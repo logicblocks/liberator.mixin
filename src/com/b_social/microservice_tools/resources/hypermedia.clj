@@ -25,7 +25,11 @@
   (json/map->wire-json data))
 
 (defn with-hal-media-type []
-  {:available-media-types [hal-media-type]})
+  {:available-media-types
+   [hal-media-type]
+
+   :service-available?
+   {:representation {:media-type hal-media-type}}})
 
 (defn with-routes-in-context [routes]
   {:initialize-context (fn [_] {:routes routes})})

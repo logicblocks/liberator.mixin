@@ -49,6 +49,20 @@
                          :accept r/hal-media-type))]
         (is (= 200 (:status response)))
         (is (= {:status "OK"}
+              (:body response)))))
+
+    (testing "correctly responds when unauthorised"
+      (let [resource (l/build-resource
+                       (r/with-hal-media-type)
+                       {:authorized? false
+                        :handle-unauthorized {:error "unauthorised"}})
+            response (call-resource
+                       resource
+                       (ring/header
+                         (ring/request :get "/")
+                         :accept r/hal-media-type))]
+        (is (= 401 (:status response)))
+        (is (= {:error "unauthorised"}
               (:body response))))))
 
   (testing "with-self-link"
