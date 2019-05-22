@@ -1,4 +1,4 @@
-(ns liberator-mixin.data
+(ns liberator-mixin.util
   (:import [java.util UUID]))
 
 (defn random-uuid []

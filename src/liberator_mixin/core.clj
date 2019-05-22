@@ -1,4 +1,4 @@
-(ns liberator-mixin.liberator
+(ns liberator-mixin.core
   (:require
     [clojure.string :as str]
 

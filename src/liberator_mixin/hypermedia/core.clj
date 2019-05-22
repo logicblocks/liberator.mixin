@@ -1,8 +1,9 @@
-(ns liberator-mixin.urls
+(ns liberator-mixin.hypermedia.core
   (:require
     [clojure.string :as str]
 
-    [bidi.bidi :refer [path-for]]))
+    [bidi.bidi :refer [path-for]]
+    [liberator-mixin.core :as core]))
 
 (defn base-url [request]
   (let [scheme (-> request :scheme name)
@@ -21,3 +22,17 @@
     (str
       (apply absolute-url-for request routes handler args)
       (str "{?" (str/join "," parameter-names) "}"))))
+
+(defn with-routes-in-context [routes]
+  {:initialize-context (fn [_] {:routes routes})})
+
+(defn with-self-link []
+  {:initialize-context
+   (fn [{:keys [resource] :as context}]
+     (when-let [get-self-link (:self resource)]
+       {:self (get-self-link context)}))})
+
+(defn with-hypermedia-mixin [dependencies]
+  (apply core/merge-resource-definitions
+    [(with-routes-in-context (:routes dependencies))
+     (with-self-link)]))

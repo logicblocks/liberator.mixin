@@ -1,4 +1,4 @@
-(ns liberator-mixin.json
+(ns liberator-mixin.json.core
   (:require
     [clojure.string :refer [starts-with?]]
 
@@ -12,8 +12,11 @@
              ->snake_case_string
              ->kebab-case-keyword]]
     [camel-snake-kebab.extras
-     :refer [transform-keys]])
+     :refer [transform-keys]]
+
+    [liberator-mixin.core :as core])
   (:import
+    [com.fasterxml.jackson.core JsonParseException]
     [com.fasterxml.jackson.core JsonGenerator]
     [org.joda.time DateTime]))
 
@@ -55,3 +58,37 @@
 
 (defn map->db-json [m & {:as options}]
   (map->json m (merge {:standard-key-fn ->snake_case_string} options)))
+
+(defn- json-request? [request]
+  (if-let [type (get-in request [:headers "content-type"])]
+    (seq (re-find #"^application/(.+\+)?json" type))))
+
+(defn- read-json [request]
+  (if (json-request? request)
+    (if-let [body (:body request)]
+      (let [body-string (slurp body)]
+        (try
+          [true (wire-json->map body-string)]
+          (catch JsonParseException _
+            [false nil]))))))
+
+(def json-media-type "application/json")
+
+(defn with-json-media-type []
+  {:available-media-types [json-media-type]})
+
+(defn with-body-parsed-as-json []
+  {:initialize-context
+   (fn [{:keys [request]}]
+     (if-let [[valid? json] (read-json request)]
+       (if valid?
+         {:request {:body json}}
+         {:malformed? true})))
+
+   :malformed?
+   (fn [{:keys [malformed?]}] malformed?)})
+
+(defn with-json-mixin [_]
+  (apply core/merge-resource-definitions
+    [(with-json-media-type)
+     (with-body-parsed-as-json)]))

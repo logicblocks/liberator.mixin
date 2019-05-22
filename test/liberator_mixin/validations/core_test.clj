@@ -1,12 +1,14 @@
-(ns liberator-mixin.resources.validation-test
-  (:require [clojure.test :refer :all]
-            [ring.mock.request :as ring]
-            [liberator-mixin.json :as json]
-            [liberator-mixin.validation :as validation]
-            [liberator-mixin.liberator :as l]
-            [liberator-mixin.resources.hypermedia :as r]
-            [liberator-mixin.resources.validation :as v]
-            [liberator-mixin.resources.json :as j]))
+(ns liberator-mixin.validations.core-test
+  (:require
+    [clojure.test :refer :all]
+
+    [ring.mock.request :as ring]
+
+    [liberator-mixin.core :as core]
+    [liberator-mixin.json.core :as json]
+    [liberator-mixin.validation.core :as validation]
+    [liberator-mixin.hypermedia.core :as hypermedia]
+    [liberator-mixin.hal.core :as hal]))
 
 (defn call-resource [resource request]
   (->
@@ -28,25 +30,25 @@
 (deftest validation-mixins
   (testing "with-validation"
     (testing "does nothing when the validator is not set"
-      (let [resource (l/build-resource
-                       (r/with-hal-media-type)
-                       (v/with-validation)
+      (let [resource (core/build-resource
+                       (hal/with-hal-media-type)
+                       (validation/with-validation)
                        {:handle-ok
                         (constantly {:status "OK"})})
             response (call-resource
                        resource
                        (ring/header
                          (ring/request :get "/")
-                         :accept r/hal-media-type))]
+                         :accept hal/hal-media-type))]
         (is (= 200 (:status response)))
         (is (= "OK"
               (get-in response [:body :status])))))
 
     (testing "validates incoming requests"
-      (let [resource (l/build-resource
-                       (r/with-hal-media-type)
-                       (r/with-self-link)
-                       (v/with-validation)
+      (let [resource (core/build-resource
+                       (hal/with-hal-media-type)
+                       (hypermedia/with-self-link)
+                       (validation/with-validation)
                        {:allowed-methods [:post]
                         :self            (constantly "https://example.com")
                         :validator       (new-mock-validator true nil)})
@@ -54,16 +56,16 @@
                        resource
                        (->
                          (ring/request :post "/")
-                         (ring/header :accept r/hal-media-type)
-                         (ring/header :content-type j/json-media-type)
+                         (ring/header :accept hal/hal-media-type)
+                         (ring/header :content-type json/json-media-type)
                          (ring/body {:key "value"})))]
         (is (= 201 (:status response)))))
 
     (testing "describes validation failures"
-      (let [resource (l/build-resource
-                       (r/with-hal-media-type)
-                       (r/with-self-link)
-                       (v/with-validation)
+      (let [resource (core/build-resource
+                       (hal/with-hal-media-type)
+                       (hypermedia/with-self-link)
+                       (validation/with-validation)
                        {:allowed-methods [:post]
                         :self            (constantly "https://example.com")
                         :validator       (new-mock-validator
@@ -73,8 +75,8 @@
                        resource
                        (->
                          (ring/request :post "/")
-                         (ring/header :accept r/hal-media-type)
-                         (ring/header :content-type j/json-media-type)
+                         (ring/header :accept hal/hal-media-type)
+                         (ring/header :content-type json/json-media-type)
                          (ring/body {:key "value"})))]
         (is (= 422 (:status response)))
         (is (some? (get-in response [:body :error-id])))
