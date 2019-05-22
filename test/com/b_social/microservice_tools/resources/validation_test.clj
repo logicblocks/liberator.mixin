@@ -15,7 +15,11 @@
 
 (deftype MockValidator [valid-response problems-for-response]
   validation/Validator
-  (valid? [_ _] valid-response)
+  (valid? [_ context]
+    (when-not (:request context)
+      (throw (ex-info "Not a valid context"
+               {:context context})))
+    valid-response)
   (problems-for [_ _] problems-for-response))
 
 (defn new-mock-validator [valid-response problems-for-response]

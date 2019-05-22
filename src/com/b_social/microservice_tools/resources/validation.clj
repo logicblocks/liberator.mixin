@@ -13,9 +13,9 @@
 (defn with-validation []
   {:processable?
    (on-write
-     (fn [{:keys [request resource]}]
-       (if-let [new-validator (:validator resource)]
-         (v/valid? (new-validator) (:body request))
+     (fn [context]
+       (if-let [new-validator (:validator (:resource context))]
+         (v/valid? (new-validator) context)
          true))
      true)
 
