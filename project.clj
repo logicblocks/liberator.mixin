@@ -1,4 +1,4 @@
-(defproject b-social/liberator-mixin "0.0.10"
+(defproject b-social/liberator-mixin "0.0.11-SNAPSHOT"
   :description "A collection of sensible defaults for liberator microservices."
   :url "https://github.com/b-social/liberator-mixin"
   :license {:name "The MIT License"
