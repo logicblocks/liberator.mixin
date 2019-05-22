@@ -10,20 +10,19 @@
   (valid? [_ m])
   (problems-for [_ m]))
 
-(defn on-write [f default]
-  (by-method
-    :put f
-    :post f
-    :any default))
-
 (defn with-validation []
-  {:processable?
-   (on-write
-     (fn [context]
-       (if-let [new-validator (:validator (:resource context))]
-         (valid? (new-validator) context)
-         true))
-     true)
+  {:validate-methods
+   [:put :post]
+
+   :processable?
+   (fn [context]
+     (if-let [new-validator (get-in context [:resource :validator])]
+       (let [method (get-in context [:request :request-method])
+             validate-methods (get-in context [:resource :validate-methods])]
+         (if (some #(= method %) (validate-methods))
+           (valid? (new-validator) context)
+           true))
+       true))
 
    :handle-unprocessable-entity
    (fn [{:keys [self request resource]}]

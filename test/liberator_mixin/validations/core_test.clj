@@ -44,6 +44,26 @@
         (is (= "OK"
               (get-in response [:body :status])))))
 
+    (testing "does not validate request if not included in validate-methods"
+      (let [resource (core/build-resource
+                       (hal/with-hal-media-type)
+                       (validation/with-validation)
+                       {:allowed-methods  [:get :post]
+                        :self             (constantly "https://example.com")
+                        :validate-methods [:get]
+                        :validator        (new-mock-validator false nil)}
+                       {:handle-created (constantly {:status "OK"})})
+            response (call-resource
+                       resource
+                       (->
+                         (ring/request :post "/")
+                         (ring/header :accept hal/hal-media-type)
+                         (ring/header :content-type json/json-media-type)
+                         (ring/body {:key "value"})))]
+        (is (= 201 (:status response)))
+        (is (= "OK"
+              (get-in response [:body :status])))))
+
     (testing "validates incoming requests"
       (let [resource (core/build-resource
                        (hal/with-hal-media-type)
@@ -52,6 +72,24 @@
                        {:allowed-methods [:post]
                         :self            (constantly "https://example.com")
                         :validator       (new-mock-validator true nil)})
+            response (call-resource
+                       resource
+                       (->
+                         (ring/request :post "/")
+                         (ring/header :accept hal/hal-media-type)
+                         (ring/header :content-type json/json-media-type)
+                         (ring/body {:key "value"})))]
+        (is (= 201 (:status response)))))
+
+    (testing "does not validate request if not included in validate-methods"
+      (let [resource (core/build-resource
+                       (hal/with-hal-media-type)
+                       (hypermedia/with-self-link)
+                       (validation/with-validation)
+                       {:allowed-methods  [:get :post]
+                        :self             (constantly "https://example.com")
+                        :validate-methods [:get]
+                        :validator        (new-mock-validator false nil)})
             response (call-resource
                        resource
                        (->
