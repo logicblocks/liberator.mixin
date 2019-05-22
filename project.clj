@@ -14,14 +14,15 @@
             [lein-changelog "0.3.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.10.0"]
                                   [ring/ring-mock "0.3.2"]]}}
-  :deploy-repositories [["releases" :clojars]]
-  :aliases {"update-readme-version" ["shell" "sed" "-i" "s/\\\\[microservice-tools \"[0-9.]*\"\\\\]/[microservice-tools \"${:version}\"]/" "README.md"]}
+  :deploy-repositories {"releases" {:url   "https://repo.clojars.org"
+                                    :creds :gpg}}
   :release-tasks [["shell" "git" "diff" "--exit-code"]
-                  ["change" "version" "leiningen.release/bump-version"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
                   ["changelog" "release"]
-                  ["update-readme-version"]
                   ["vcs" "commit"]
                   ["vcs" "tag"]
                   ["deploy"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag"]
                   ["vcs" "push"]])
