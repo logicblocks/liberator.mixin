@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.10] — 2019-05-22
+
 ## [0.0.9] — 2019-05-22
 
 ## [0.0.9] — 2019-05-22
@@ -47,4 +49,5 @@ Released without _CHANGELOG.md_.
 [0.0.9]: https://github.com/b-social/liberator-mixin/compare/0.0.9...0.0.9
 [0.0.9]: https://github.com/b-social/liberator-mixin/compare/0.0.9...0.0.9
 [0.0.9]: https://github.com/b-social/liberator-mixin/compare/0.0.9...0.0.9
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.9...HEAD
+[0.0.10]: https://github.com/b-social/liberator-mixin/compare/0.0.9...0.0.10
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.10...HEAD
