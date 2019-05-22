@@ -25,11 +25,10 @@
        true))
 
    :handle-unprocessable-entity
-   (fn [{:keys [self request resource]}]
+   (fn [{:keys [self resource] :as context}]
      (let [new-validator (:validator resource)
-           body (:body request)
            error-id (util/random-uuid)
-           error-context (problems-for (new-validator) body)]
+           error-context (problems-for (new-validator) context)]
        (->
          (hal/new-resource self)
          (hal/add-property :error-id error-id)

@@ -10,6 +10,11 @@
     [liberator-mixin.hypermedia.core :as hypermedia]
     [liberator-mixin.hal.core :as hal]))
 
+(defn assert-valid-context [context]
+  (when-not (:request context)
+    (throw (ex-info "Not a valid context"
+             {:context context}))))
+
 (defn call-resource [resource request]
   (->
     (resource request)
@@ -18,11 +23,11 @@
 (deftype MockValidator [valid-response problems-for-response]
   validation/Validator
   (valid? [_ context]
-    (when-not (:request context)
-      (throw (ex-info "Not a valid context"
-               {:context context})))
+    (assert-valid-context context)
     valid-response)
-  (problems-for [_ _] problems-for-response))
+  (problems-for [_ context]
+    (assert-valid-context context)
+    problems-for-response))
 
 (defn new-mock-validator [valid-response problems-for-response]
   (->MockValidator valid-response problems-for-response))
