@@ -1,4 +1,4 @@
-(defproject com.b-social/microservice-tools "0.0.4"
+(defproject com.b-social/microservice-tools "0.0.5-SNAPSHOT"
   :description "A collection of sensible defaults for liberator microservices"
   :url "https://github.com/b-social/microservice-tools"
   :license "Proprietary"
