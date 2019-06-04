@@ -33,6 +33,5 @@
        {:self (get-self-link context)}))})
 
 (defn with-hypermedia-mixin [dependencies]
-  (apply core/merge-resource-definitions
-    [(with-routes-in-context (:routes dependencies))
-     (with-self-link)]))
+  [(with-routes-in-context (:routes dependencies))
+   (with-self-link)])

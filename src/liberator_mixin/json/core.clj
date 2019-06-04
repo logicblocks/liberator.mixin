@@ -89,6 +89,5 @@
    (fn [{:keys [malformed?]}] malformed?)})
 
 (defn with-json-mixin [_]
-  (apply core/merge-resource-definitions
-    [(with-json-media-type)
-     (with-body-parsed-as-json)]))
+  [(with-json-media-type)
+   (with-body-parsed-as-json)])

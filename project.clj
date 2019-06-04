@@ -20,7 +20,7 @@
              :dev    [:shared]
              :test   [:shared]}
   :eftest {:multithread? false}
-  :repl-options {:init-ns spec-validate.core}
+  :repl-options {:init-ns liberator-mixin.core}
   :deploy-repositories {"releases" {:url   "https://repo.clojars.org"
                                     :creds :gpg}}
   :release-tasks [["shell" "git" "diff" "--exit-code"]

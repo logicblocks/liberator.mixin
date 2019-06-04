@@ -60,6 +60,5 @@
        {:error not-found-message}))})
 
 (defn with-hal-mixin [_]
-  (apply core/merge-resource-definitions
-    [(with-hal-media-type)
-     (with-not-found-handler)]))
+  [(with-hal-media-type)
+   (with-not-found-handler)])

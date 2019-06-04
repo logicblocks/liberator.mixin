@@ -5,6 +5,9 @@
     [liberator.core :as liberator]
     [liberator.util :refer [make-function]]))
 
+(defn- ensure-seq [thing-or-seq]
+  (if (seq? thing-or-seq) thing-or-seq [thing-or-seq]))
+
 (defn is-decision? [k]
   (str/ends-with? (name k) "?"))
 
@@ -24,9 +27,9 @@
                     context-update (if-vector? decision second)
                     context (liberator/update-context context context-update)]
                 [result context]))]
-           (-> [true context]
-             (execute-and-update (make-function left))
-             (execute-and-update (make-function right))))))
+      (-> [true context]
+        (execute-and-update (make-function left))
+        (execute-and-update (make-function right))))))
 
 (defn merge-actions [left right]
   (fn [context]
@@ -56,6 +59,7 @@
       {}
       definition-pieces)))
 
-(defn build-resource [& ms]
-  (liberator/resource
-    (apply merge-resource-definitions ms)))
+(defn build-resource [& ms-or-seqs]
+  (let [flattened (flatten (map ensure-seq ms-or-seqs))]
+    (liberator/resource
+      (apply merge-resource-definitions flattened))))
