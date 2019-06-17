@@ -34,13 +34,13 @@
 
 (add-encoder DateTime clj-time-encoder)
 
-(defn- json->map [string options]
+(defn json->map [string options]
   (let [meta-key-fn (or (:meta-key-fn options) keyword)
         standard-key-fn (or (:standard-key-fn options) ->kebab-case-keyword)]
     (json/parse-string string
       (if-metadata meta-key-fn standard-key-fn))))
 
-(defn- map->json [m options]
+(defn map->json [m options]
   (let [meta-key-fn (or (:meta-key-fn options) name)
         standard-key-fn (or (:standard-key-fn options) ->camelCaseString)]
     (json/generate-string m

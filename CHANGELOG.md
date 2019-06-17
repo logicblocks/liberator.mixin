@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.12] — 2019-06-17
+- Made json->map and map->json public
+
 ## [0.0.11] — 2019-06-04
 
 ## [0.0.10] — 2019-05-22

@@ -7,6 +7,9 @@
 
     [ring.mock.request :as ring]
 
+    [camel-snake-kebab.core
+     :refer [->camelCaseString]]
+
     [liberator-mixin.core :as l]
     [liberator-mixin.json.core :as json]))
 
@@ -31,6 +34,25 @@
               (:body response))))))
 
   (testing "with-body-parsed-as-json"
+    (testing "parses the body as json"
+      (let [resource (l/build-resource
+                       (json/with-json-media-type)
+                       (json/with-body-parsed-as-json)
+                       {:allowed-methods [:post]
+                        :handle-created
+                                         (fn [{:keys [request]}]
+                                           (:body request))})
+            request (->
+                      (ring/request :post "/")
+                      (ring/header "Accept" json/json-media-type)
+                      (ring/header "Content-Type" json/json-media-type)
+                      (ring/body (json/map->json {:key "value"}
+                                   {:standard-key-fn ->camelCaseString})))
+            response (call-resource resource request)]
+        (is (= 201 (:status response)))
+        (is (=
+              {:key "value"}
+              (:body response)))))
     (testing "parses the body as json"
       (let [resource (l/build-resource
                        (json/with-json-media-type)
@@ -131,6 +153,22 @@
       (is (=
             {:_some_links 123}
             (json/db-json->map "{\"_some_links\": 123}")))))
+
+  (testing "json->map"
+    (testing "parses json"
+      (is (=
+            {:key 123}
+            (json/json->map "{\"key\": 123}" {}))))
+
+    (testing "converts keys to kebab case"
+      (is (=
+            {:some-key 123}
+            (json/json->map "{\"some_key\": 123}" {}))))
+
+    (testing "preserves keys prefixed with an underscore"
+      (is (=
+            {:_some_links 123}
+            (json/json->map "{\"_some_links\": 123}" {})))))
 
   (testing "map->db-json"
     (testing "returns a json string"
