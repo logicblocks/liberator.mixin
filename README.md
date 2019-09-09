@@ -1,10 +1,18 @@
 # liberator-mixin
 
-A Clojure library designed to ... well, that part is up to you.
+An extension to liberator allowing for composable mixins.
+
+## Install
+
+Add the following to your `project.clj` file:
 
 ```clj
-[liberator-mixin "0.0.0"]
+[b-social/liberator-mixin "0.0.10"]
 ```
+
+## Documentation
+
+* [API Docs](http://b-social.github.io/liberator-mixin)
 
 ## Usage
 
@@ -12,7 +20,7 @@ FIXME
 
 ## License
 
-Copyright © 2018 FIXME
+Copyright © 2018 B-Social Ltd.
 
 Distributed under the terms of the 
 [MIT License](http://opensource.org/licenses/MIT).

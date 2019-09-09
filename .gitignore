@@ -1,6 +1,7 @@
 /target
 /classes
 /checkouts
+/work
 pom.xml
 pom.xml.asc
 *.jar
@@ -9,3 +10,6 @@ pom.xml.asc
 /.nrepl-port
 /.idea
 /*.iml
+/*.ipr
+/*.iws
+.DS_Store
