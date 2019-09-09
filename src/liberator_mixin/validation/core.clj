@@ -2,9 +2,12 @@
   (:require
     [halboy.resource :as hal]
 
-    [liberator.util :refer [by-method]]
+    [liberator.util :refer [by-method]])
+  (:import
+    [java.util UUID]))
 
-    [liberator-mixin.util :as util]))
+(defn- random-uuid []
+  (str (UUID/randomUUID)))
 
 (defprotocol Validator
   (valid? [_ m])
@@ -27,7 +30,7 @@
    :handle-unprocessable-entity
    (fn [{:keys [self resource] :as context}]
      (let [new-validator (:validator resource)
-           error-id (util/random-uuid)
+           error-id (random-uuid)
            error-context (problems-for (new-validator) context)]
        (->
          (hal/new-resource self)

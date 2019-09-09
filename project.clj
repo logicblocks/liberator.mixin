@@ -3,20 +3,20 @@
   :url "https://github.com/b-social/liberator-mixin"
   :license {:name "The MIT License"
             :url  "https://opensource.org/licenses/MIT"}
-  :dependencies [[cheshire "5.8.1"]
-                 [liberator "0.15.2"]
-                 [halboy "4.0.1"]
+  :dependencies [[cheshire "5.9.0"]
+                 [liberator "0.15.3"]
+                 [halboy "5.1.0"]
                  [camel-snake-kebab "0.4.0"]
                  [clj-time "0.15.1"]
-                 [bidi "2.1.4"]]
+                 [bidi "2.1.6"]]
   :plugins [[lein-cloverage "1.0.13"]
             [lein-shell "0.5.0"]
             [lein-ancient "0.6.15"]
             [lein-changelog "0.3.2"]
-            [lein-eftest "0.5.3"]]
+            [lein-eftest "0.5.8"]]
   :profiles {:shared {:dependencies [[org.clojure/clojure "1.10.0"]
-                                     [ring/ring-mock "0.3.2"]
-                                     [eftest "0.5.3"]]}
+                                     [ring/ring-mock "0.4.0"]
+                                     [eftest "0.5.8"]]}
              :dev    [:shared]
              :test   [:shared]}
   :eftest {:multithread? false}

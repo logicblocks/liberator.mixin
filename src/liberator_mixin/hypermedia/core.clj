@@ -2,8 +2,7 @@
   (:require
     [clojure.string :as str]
 
-    [bidi.bidi :refer [path-for]]
-    [liberator-mixin.core :as core]))
+    [bidi.bidi :refer [path-for]]))
 
 (defn base-url [request]
   (let [scheme (-> request :scheme name)

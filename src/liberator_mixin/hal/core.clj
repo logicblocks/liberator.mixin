@@ -5,22 +5,25 @@
 
     [liberator.representation :as r]
 
-    [liberator-mixin.core :as core]
-    [liberator-mixin.util :as util]
     [liberator-mixin.hypermedia.core :as hypermedia]
     [liberator-mixin.json.core :as json]
-    [liberator-mixin.logging.core :as log]))
+    [liberator-mixin.logging.core :as log])
+  (:import
+    [halboy.resource Resource]
+    [java.util UUID]))
+
+(defn- random-uuid []
+  (str (UUID/randomUUID)))
 
 (def hal-media-type "application/hal+json")
 
 (extend-protocol r/Representation
-  halboy.resource.Resource
+  Resource
   (as-response [data {:keys [request routes] :as context}]
     (r/as-response
       (-> data
-        (hal/add-link
-          :discovery
-          {:href (hypermedia/absolute-url-for request routes :discovery)})
+        (hal/add-link :discovery
+          (hypermedia/absolute-url-for request routes :discovery))
         (hal-json/resource->map))
       context)))
 
@@ -37,7 +40,7 @@
 (defn with-exception-handler []
   {:handle-exception
    (fn [{:keys [exception resource]}]
-     (let [error-id (util/random-uuid)
+     (let [error-id (random-uuid)
            message "Request caused an exception"]
        (do
          (when-let [get-logger (:logger resource)]
