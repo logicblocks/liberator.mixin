@@ -54,9 +54,9 @@
   (fn merged
     ([] (merged {}))
     ([context]
-     (liberator-util/combine
-       ((liberator-util/make-function left) context)
-       ((liberator-util/make-function right) context)))))
+      (liberator-util/combine
+        ((liberator-util/make-function left) context)
+        ((liberator-util/make-function right) context)))))
 
 (defn merge-resource-definitions
   [& maps]

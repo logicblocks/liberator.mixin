@@ -42,17 +42,14 @@
    (fn [{:keys [exception resource]}]
      (let [error-id (random-uuid)
            message "Request caused an exception"]
-       (do
-         (when-let [get-logger (:logger resource)]
-           (log/log-error
-             (get-logger)
-             message
-             {:error-id error-id}
-             exception))
-         (hal/add-properties
-           (hal/new-resource)
-           {:error-id error-id
-            :message  message}))))})
+       (when-let [get-logger (:logger resource)]
+         (log/log-error (get-logger) message
+           {:error-id error-id}
+           exception))
+       (hal/add-properties
+         (hal/new-resource)
+         {:error-id error-id
+          :message message})))})
 
 (defn with-not-found-handler []
   {:handle-not-found

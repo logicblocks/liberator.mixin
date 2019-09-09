@@ -35,8 +35,8 @@
                        (hypermedia/with-self-link)
                        {:self (constantly self-link)
                         :handle-ok
-                              (fn [{:keys [self]}]
-                                {:self self})})
+                        (fn [{:keys [self]}]
+                          {:self self})})
             response (call-resource
                        resource
                        (ring/header
@@ -51,11 +51,11 @@
     (testing "returns the domain name for a url"
       (is (= "https://example.com"
             (hypermedia/base-url {:scheme  :https
-                       :headers {"host" "example.com"}})))
+                                  :headers {"host" "example.com"}})))
 
       (is (= "http://another.example.com"
             (hypermedia/base-url {:scheme  :http
-                       :headers {"host" "another.example.com"}})))))
+                                  :headers {"host" "another.example.com"}})))))
 
   (testing "absolute-url-for"
     (testing "returns the absolute url for a route"

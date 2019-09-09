@@ -40,8 +40,8 @@
                        (json/with-body-parsed-as-json)
                        {:allowed-methods [:post]
                         :handle-created
-                                         (fn [{:keys [request]}]
-                                           (:body request))})
+                        (fn [{:keys [request]}]
+                          (:body request))})
             request (->
                       (ring/request :post "/")
                       (ring/header "Accept" json/json-media-type)
@@ -59,8 +59,8 @@
                        (json/with-body-parsed-as-json)
                        {:allowed-methods [:post]
                         :handle-created
-                                         (fn [{:keys [request]}]
-                                           (:body request))})
+                        (fn [{:keys [request]}]
+                          (:body request))})
             request (->
                       (ring/request :post "/")
                       (ring/header "Accept" json/json-media-type)

@@ -280,8 +280,8 @@
      :expected-left-context {:first [1 2] :second "second"}
      :expected-right-context {:first [1 2 3 4] :second "second"}
      :result [false {:first [1 2 3 4 5 6]
-                    :second "second"
-                    :third "third"}])
+                     :second "second"
+                     :third "third"}])
 
    (merge-test
      :description (str "returns false and context when left returns false "
@@ -316,8 +316,8 @@
      :expected-left-context {:first [1 2] :second "second"}
      :expected-right-context {:first [1 2 3 4] :second "second"}
      :result [true {:first [1 2 3 4 5 6]
-                     :second "second"
-                     :third "third"}])
+                    :second "second"
+                    :third "third"}])
 
    (merge-test
      :description "executes left before right when both decisions are fns"

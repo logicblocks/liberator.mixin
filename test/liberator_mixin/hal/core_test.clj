@@ -1,9 +1,9 @@
 (ns liberator-mixin.hal.core-test
-  (:require 
+  (:require
     [clojure.test :refer :all]
-    
+
     [ring.mock.request :as ring]
-    
+
     [liberator-mixin.core :as core]
     [liberator-mixin.json.core :as json]
     [liberator-mixin.logging.core :as log]
