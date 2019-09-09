@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.14] — 2019-09-09
 ### Added
 - Test coverage for all merge functions.
 - Configuration merging for attributes such as `allowed-methods`, 
@@ -54,4 +56,5 @@ Released without _CHANGELOG.md_.
 [0.0.10]: https://github.com/b-social/liberator-mixin/compare/0.0.9...0.0.10
 [0.0.10]: https://github.com/b-social/liberator-mixin/compare/0.0.10...0.0.10
 [0.0.11]: https://github.com/b-social/liberator-mixin/compare/0.0.10...0.0.11
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.11...HEAD
+[0.0.14]: https://github.com/b-social/liberator-mixin/compare/0.0.11...0.0.14
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.14...HEAD
