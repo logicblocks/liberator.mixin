@@ -8,6 +8,10 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Configuration merging to favour later definitions by placing them first in
+  the resulting sequence.
+- JSON encoding to use `jason` to provide default support for time types.
 
 ## [0.0.18] — 2019-09-10
 ### Removed

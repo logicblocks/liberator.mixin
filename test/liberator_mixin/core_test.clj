@@ -448,44 +448,44 @@
 
 (def configuration-tests
   [(merge-test
-     :description (str "concatenates sequences when both right and left are "
-                    "sequences")
+     :description (str "reverse concatenates sequences when both right and "
+                    "left are sequences")
      :context {}
      :left-attribute [:first :second :third]
      :right-attribute [:fourth :fifth :sixth]
      :expected-left-context nil
      :expected-right-context nil
-     :result [:first :second :third :fourth :fifth :sixth])
+     :result [:fourth :fifth :sixth :first :second :third])
 
    (merge-test
-     :description (str "concatenates sequences when left is a sequence and "
-                    "right is a function")
+     :description (str "reverse concatenates sequences when left is a "
+                    "sequence and right is a function")
      :context {:important :things}
      :left-attribute [:first :second :third]
      :right-attribute (fn [_] [:fourth :fifth :sixth])
      :expected-left-context nil
      :expected-right-context {:important :things}
-     :result [:first :second :third :fourth :fifth :sixth])
+     :result [:fourth :fifth :sixth :first :second :third])
 
    (merge-test
-     :description (str "concatenates sequences when left is a function and "
-                    "right is a sequence")
+     :description (str "reverse concatenates sequences when left is a "
+                    "function and right is a sequence")
      :context {:important :things}
      :left-attribute (fn [_] [:first :second :third])
      :right-attribute [:fourth :fifth :sixth]
      :expected-left-context {:important :things}
      :expected-right-context nil
-     :result [:first :second :third :fourth :fifth :sixth])
+     :result [:fourth :fifth :sixth :first :second :third])
 
    (merge-test
-     :description (str "concatenates sequences when left is a function and "
-                    "right is a function")
+     :description (str "reverse concatenates sequences when left is a "
+                    "function and right is a function")
      :context {:important :things}
      :left-attribute (fn [_] [:first :second :third])
      :right-attribute (fn [_] [:fourth :fifth :sixth])
      :expected-left-context {:important :things}
      :expected-right-context {:important :things}
-     :result [:first :second :third :fourth :fifth :sixth])
+     :result [:fourth :fifth :sixth :first :second :third])
 
    (merge-test
      :description (str "replaces when both sequences and right sequence "

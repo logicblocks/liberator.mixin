@@ -2,11 +2,16 @@
   (:require
     [clojure.string :refer [starts-with?]]
 
-    [jason.core :as jason :refer [defcoders]])
+    [jason.core :refer [defcoders]]
+
+    [liberator.representation :as r])
   (:import
     [com.fasterxml.jackson.core JsonParseException]))
 
-(def ^:private <-wire-json (jason/new-json-decoder))
+(declare
+  ->wire-json
+  <-wire-json)
+(defcoders wire)
 
 (defn- json-request? [request]
   (if-let [type (get-in request [:headers "content-type"])]
@@ -22,6 +27,12 @@
             [false nil]))))))
 
 (def json-media-type "application/json")
+
+(defmethod r/render-map-generic json-media-type [data _]
+  (->wire-json data))
+
+(defmethod r/render-seq-generic json-media-type [data _]
+  (->wire-json data))
 
 (defn with-json-media-type []
   {:available-media-types [json-media-type]})

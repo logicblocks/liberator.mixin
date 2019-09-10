@@ -1,7 +1,7 @@
 (ns liberator-mixin.hal.core
   (:require
     [halboy.resource :as hal]
-    [halboy.json :as hal-json]
+    [halboy.json :as haljson]
 
     [hype.core :as hype]
 
@@ -27,7 +27,7 @@
       (-> data
         (hal/add-link :discovery
           (hype/absolute-url-for request routes :discovery))
-        (hal-json/resource->map))
+        (haljson/resource->map))
       context)))
 
 (defmethod r/render-map-generic hal-media-type [data _]

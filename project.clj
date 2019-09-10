@@ -34,6 +34,7 @@
   :codox
   {:namespaces  [#"^liberator-mixin\."]
    :output-path "docs"
+   :doc-paths   ["docs"]
    :source-uri  "https://github.com/b-social/liberator-mixin/blob/{version}/{filepath}#L{line}"}
 
   :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}

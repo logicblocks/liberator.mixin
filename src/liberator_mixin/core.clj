@@ -54,9 +54,22 @@
   (fn merged
     ([] (merged {}))
     ([context]
-      (liberator-util/combine
-        ((liberator-util/make-function left) context)
-        ((liberator-util/make-function right) context)))))
+      (let [left-conf ((liberator-util/make-function left) context)
+            right-conf ((liberator-util/make-function right) context)]
+        (cond
+          (-> right-conf meta :replace)
+          right-conf
+
+          (and (list? left-conf) (coll? right-conf))
+          (apply list (concat right-conf left-conf))
+
+          (and (vector? left-conf) (coll? right-conf))
+          (into right-conf left-conf)
+
+          (and (set? left-conf) (coll? right-conf))
+          (into left-conf right-conf)
+
+          :otherwise right-conf)))))
 
 (defn merge-resource-definitions
   [& maps]
