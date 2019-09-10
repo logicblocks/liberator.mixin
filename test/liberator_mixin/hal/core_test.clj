@@ -4,8 +4,9 @@
 
     [ring.mock.request :as ring]
 
+    [jason.core :refer [defcoders]]
+
     [liberator-mixin.core :as core]
-    [liberator-mixin.json.core :as json]
     [liberator-mixin.logging.core :as log]
     [liberator-mixin.hal.core :as r]))
 
@@ -21,10 +22,16 @@
 (defn new-test-logger [state]
   (->TestLogger state))
 
+(declare
+  ->wire-json
+  <-wire-json)
+
+(defcoders wire)
+
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body json/wire-json->map)))
+    (update :body <-wire-json)))
 
 (deftest hal-mixins
   (testing "with-hal-media-type"

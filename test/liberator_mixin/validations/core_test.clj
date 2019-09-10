@@ -4,11 +4,19 @@
 
     [ring.mock.request :as ring]
 
+    [jason.core :refer [defcoders]]
+
     [liberator-mixin.core :as core]
     [liberator-mixin.json.core :as json]
     [liberator-mixin.validation.core :as validation]
     [liberator-mixin.hypermedia.core :as hypermedia]
     [liberator-mixin.hal.core :as hal]))
+
+(declare
+  ->wire-json
+  <-wire-json)
+
+(defcoders wire)
 
 (defn assert-valid-context [context]
   (when-not (:request context)
@@ -18,7 +26,7 @@
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body json/wire-json->map)))
+    (update :body <-wire-json)))
 
 (deftype MockValidator [valid-response problems-for-response]
   validation/Validator

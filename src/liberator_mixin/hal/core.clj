@@ -3,10 +3,11 @@
     [halboy.resource :as hal]
     [halboy.json :as hal-json]
 
+    [jason.core :as jason]
+
     [liberator.representation :as r]
 
     [liberator-mixin.hypermedia.core :as hypermedia]
-    [liberator-mixin.json.core :as json]
     [liberator-mixin.logging.core :as log])
   (:import
     [halboy.resource Resource]
@@ -16,6 +17,8 @@
   (str (UUID/randomUUID)))
 
 (def hal-media-type "application/hal+json")
+
+(def ^:private ->wire-json (jason/new-json-encoder))
 
 (extend-protocol r/Representation
   Resource
@@ -28,7 +31,7 @@
       context)))
 
 (defmethod r/render-map-generic hal-media-type [data _]
-  (json/map->wire-json data))
+  (->wire-json data))
 
 (defn with-hal-media-type []
   {:available-media-types

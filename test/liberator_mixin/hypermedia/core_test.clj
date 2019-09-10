@@ -4,14 +4,22 @@
 
     [ring.mock.request :as ring]
 
+    [jason.core :refer [defcoders]]
+
     [liberator-mixin.core :as core]
     [liberator-mixin.json.core :as json]
     [liberator-mixin.hypermedia.core :as hypermedia]))
 
+(declare
+  ->wire-json
+  <-wire-json)
+
+(defcoders wire)
+
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body json/wire-json->map)))
+    (update :body <-wire-json)))
 
 (deftest hypermedia-mixins
   (testing "with-routes-in-context"

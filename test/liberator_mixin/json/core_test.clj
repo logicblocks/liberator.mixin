@@ -2,23 +2,25 @@
   (:require
     [clojure.test :refer :all]
 
-    [clojure.string :as str]
-    [clj-time.core :as date]
-
     [ring.mock.request :as ring]
 
-    [camel-snake-kebab.core
-     :refer [->camelCaseString]]
+    [jason.core :refer [defcoders]]
 
     [liberator-mixin.core :as l]
     [liberator-mixin.json.core :as json]))
 
+(declare
+  ->wire-json
+  <-wire-json)
+
+(defcoders wire)
+
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body json/wire-json->map)))
+    (update :body <-wire-json)))
 
-(deftest json-mixins
+(deftest json-mixin
   (testing "with-json-media-type"
     (testing "allows hypermedia requests"
       (let [resource (l/build-resource
@@ -46,8 +48,7 @@
                       (ring/request :post "/")
                       (ring/header "Accept" json/json-media-type)
                       (ring/header "Content-Type" json/json-media-type)
-                      (ring/body (json/map->json {:key "value"}
-                                   {:standard-key-fn ->camelCaseString})))
+                      (ring/body (->wire-json {:key "value"})))
             response (call-resource resource request)]
         (is (= 201 (:status response)))
         (is (=
@@ -65,7 +66,7 @@
                       (ring/request :post "/")
                       (ring/header "Accept" json/json-media-type)
                       (ring/header "Content-Type" json/json-media-type)
-                      (ring/body (json/map->wire-json {:key "value"})))
+                      (ring/body (->wire-json {:key "value"})))
             response (call-resource resource request)]
         (is (= 201 (:status response)))
         (is (=
@@ -84,121 +85,3 @@
                       (ring/body "not valid json"))
             response (resource request)]
         (is (= 400 (:status response)))))))
-
-(defn- long-str [& args]
-  (str/join "\n" args))
-
-(deftest json
-  (testing "wire-json->map"
-    (testing "parses json"
-      (is (=
-            {:key 123}
-            (json/wire-json->map "{\"key\": 123}"))))
-
-    (testing "converts keys to kebab case"
-      (is (=
-            {:some-key 123}
-            (json/wire-json->map "{\"someKey\": 123}"))))
-
-    (testing "preserves keys prefixed with an underscore"
-      (is (=
-            {:_someLinks 123}
-            (json/wire-json->map "{\"_someLinks\": 123}")))))
-
-  (testing "map->wire-json"
-    (testing "returns a json string"
-      (is (=
-            (long-str
-              "{"
-              "  \"key\" : 123"
-              "}")
-            (json/map->wire-json {:key 123}))))
-
-    (testing "converts dates"
-      (is (=
-            (long-str
-              "{"
-              "  \"key\" : \"2019-02-03T00:00:00.000Z\""
-              "}")
-            (json/map->wire-json {:key (date/date-time 2019 2 3)}))))
-
-    (testing "converts keys to kebab case"
-      (is (=
-            (long-str
-              "{"
-              "  \"someKey\" : 123"
-              "}")
-            (json/map->wire-json {:some-key 123}))))
-
-    (testing "preserves meta keys"
-      (is (=
-            (long-str
-              "{"
-              "  \"_some-key\" : 123"
-              "}")
-            (json/map->wire-json {:_some-key 123})))))
-
-  (testing "db-json->map"
-    (testing "parses json"
-      (is (=
-            {:key 123}
-            (json/db-json->map "{\"key\": 123}"))))
-
-    (testing "converts keys to kebab case"
-      (is (=
-            {:some-key 123}
-            (json/db-json->map "{\"some_key\": 123}"))))
-
-    (testing "preserves keys prefixed with an underscore"
-      (is (=
-            {:_some_links 123}
-            (json/db-json->map "{\"_some_links\": 123}")))))
-
-  (testing "json->map"
-    (testing "parses json"
-      (is (=
-            {:key 123}
-            (json/json->map "{\"key\": 123}" {}))))
-
-    (testing "converts keys to kebab case"
-      (is (=
-            {:some-key 123}
-            (json/json->map "{\"some_key\": 123}" {}))))
-
-    (testing "preserves keys prefixed with an underscore"
-      (is (=
-            {:_some_links 123}
-            (json/json->map "{\"_some_links\": 123}" {})))))
-
-  (testing "map->db-json"
-    (testing "returns a json string"
-      (is (=
-            (long-str
-              "{"
-              "  \"key\" : 123"
-              "}")
-            (json/map->db-json {:key 123}))))
-
-    (testing "converts dates"
-      (is (=
-            (long-str
-              "{"
-              "  \"key\" : \"2019-02-03T00:00:00.000Z\""
-              "}")
-            (json/map->db-json {:key (date/date-time 2019 2 3)}))))
-
-    (testing "converts keys to snake case"
-      (is (=
-            (long-str
-              "{"
-              "  \"some_key\" : 123"
-              "}")
-            (json/map->db-json {:some-key 123}))))
-
-    (testing "preserves meta keys"
-      (is (=
-            (long-str
-              "{"
-              "  \"_some-key\" : 123"
-              "}")
-            (json/map->db-json {:_some-key 123}))))))
