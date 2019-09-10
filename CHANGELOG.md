@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.19] — 2019-09-11
 ### Changed
 - Configuration merging to favour later definitions by placing them first in
   the resulting sequence.
@@ -80,4 +82,5 @@ Released without _CHANGELOG.md_.
 [0.0.16]: https://github.com/b-social/liberator-mixin/compare/0.0.15...0.0.16
 [0.0.17]: https://github.com/b-social/liberator-mixin/compare/0.0.16...0.0.17
 [0.0.18]: https://github.com/b-social/liberator-mixin/compare/0.0.17...0.0.18
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.18...HEAD
+[0.0.19]: https://github.com/b-social/liberator-mixin/compare/0.0.18...0.0.19
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.19...HEAD
