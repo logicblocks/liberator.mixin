@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Revert to `slurp`ing body before attempting JSON parse.
 
 ## [0.0.16] — 2019-09-10
 ### Fixed

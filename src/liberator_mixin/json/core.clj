@@ -19,10 +19,11 @@
 (defn- read-json [request]
   (if (json-request? request)
     (if-let [body (:body request)]
-      (try
-        [true (<-wire-json body)]
-        (catch JsonParseException _
-          [false nil])))))
+      (let [body-string (slurp body)]
+        (try
+          [true (<-wire-json body-string)]
+          (catch JsonParseException _
+            [false nil]))))))
 
 (def json-media-type "application/json")
 
