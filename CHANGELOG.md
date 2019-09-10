@@ -8,6 +8,9 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Removed
+- URL generating functions from `liberator-mixin.hypermedia`. `hype` now
+  supersedes them.
 
 ## [0.0.17] — 2019-09-10
 ### Changed

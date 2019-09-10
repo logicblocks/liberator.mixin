@@ -2,11 +2,7 @@
   (:require
     [clojure.string :refer [starts-with?]]
 
-    [jason.core :as jason :refer [defcoders]]
-
-    [camel-snake-kebab.core
-     :refer [->camelCaseString
-             ->kebab-case-keyword]])
+    [jason.core :as jason :refer [defcoders]])
   (:import
     [com.fasterxml.jackson.core JsonParseException]))
 

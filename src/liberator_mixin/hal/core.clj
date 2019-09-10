@@ -3,11 +3,11 @@
     [halboy.resource :as hal]
     [halboy.json :as hal-json]
 
+    [hype.core :as hype]
+
     [jason.core :as jason]
 
     [liberator.representation :as r]
-
-    [liberator-mixin.hypermedia.core :as hypermedia]
     [liberator-mixin.logging.core :as log])
   (:import
     [halboy.resource Resource]
@@ -26,7 +26,7 @@
     (r/as-response
       (-> data
         (hal/add-link :discovery
-          (hypermedia/absolute-url-for request routes :discovery))
+          (hype/absolute-url-for request routes :discovery))
         (hal-json/resource->map))
       context)))
 

@@ -7,12 +7,8 @@
 
   :dependencies [[liberator "0.15.3"]
                  [halboy "5.1.0"]
-                 [camel-snake-kebab "672421b575737c5496b7ddcfb83cf150b0d0bc75"]
-                 [clj-time "0.15.1"]
-                 [bidi "2.1.6"]
-                 [b-social/jason "0.1.2"]]
-
-  :middleware [lein-git-down.plugin/inject-properties]
+                 [b-social/jason "0.1.2"]
+                 [b-social/hype "0.0.17"]]
 
   :plugins [[lein-cloverage "1.0.13"]
             [lein-shell "0.5.0"]
@@ -22,8 +18,7 @@
             [lein-codox "0.10.7"]
             [lein-cljfmt "0.6.4"]
             [lein-kibit "0.1.6"]
-            [lein-bikeshed "0.5.1"]
-            [reifyhealth/lein-git-down "0.3.5"]]
+            [lein-bikeshed "0.5.1"]]
 
   :profiles {:shared {:dependencies
                       [[org.clojure/clojure "1.10.0"]
@@ -42,11 +37,6 @@
    :source-uri  "https://github.com/b-social/liberator-mixin/blob/{version}/{filepath}#L{line}"}
 
   :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}
-
-  :git-down
-  {camel-snake-kebab {:coordinates clj-commons/camel-snake-kebab}}
-
-  :repositories [["public-github" {:url "git://github.com"}]]
 
   :deploy-repositories
   {"releases" {:url "https://repo.clojars.org" :creds :gpg}}

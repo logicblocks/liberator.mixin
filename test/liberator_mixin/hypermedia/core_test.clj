@@ -10,10 +10,7 @@
     [liberator-mixin.json.core :as json]
     [liberator-mixin.hypermedia.core :as hypermedia]))
 
-(declare
-  ->wire-json
-  <-wire-json)
-
+(declare <-wire-json)
 (defcoders wire)
 
 (defn call-resource [resource request]
@@ -53,66 +50,3 @@
         (is (=
               self-link
               (get-in response [:body :self])))))))
-
-(deftest urls
-  (testing "base-url"
-    (testing "returns the domain name for a url"
-      (is (= "https://example.com"
-            (hypermedia/base-url {:scheme  :https
-                                  :headers {"host" "example.com"}})))
-
-      (is (= "http://another.example.com"
-            (hypermedia/base-url {:scheme  :http
-                                  :headers {"host" "another.example.com"}})))))
-
-  (testing "absolute-url-for"
-    (testing "returns the absolute url for a route"
-      (let [request {:scheme :https
-                     :headers {"host" "example.com"}}
-            routes [""
-                    [["/" :root]
-                     ["/examples" :examples]]]]
-        (is (= "https://example.com/examples"
-              (hypermedia/absolute-url-for request routes :examples)))))
-
-    (testing "expands arguments"
-      (let [request {:scheme :https
-                     :headers {"host" "example.com"}}
-            routes [""
-                    [["/" :root]
-                     [["/examples/" :example-id] :example]]]]
-        (is (= "https://example.com/examples/123"
-              (hypermedia/absolute-url-for request routes :example
-                :example-id 123))))))
-
-  (testing "parameterised-url-for"
-    (testing "describes a single parameter"
-      (let [request {:scheme :https
-                     :headers {"host" "example.com"}}
-            routes [""
-                    [["/" :root]
-                     ["/examples" :examples]]]]
-        (is (= "https://example.com/examples{?first}"
-              (hypermedia/parameterised-url-for request routes :examples
-                [:first])))))
-
-    (testing "describes multiple parameters"
-      (let [request {:scheme :https
-                     :headers {"host" "example.com"}}
-            routes [""
-                    [["/" :root]
-                     ["/examples" :examples]]]]
-        (is (= "https://example.com/examples{?first,second}"
-              (hypermedia/parameterised-url-for request routes :examples
-                [:first :second])))))
-
-    (testing "mixes positional and query parameters"
-      (let [request {:scheme :https
-                     :headers {"host" "example.com"}}
-            routes [""
-                    [["/" :root]
-                     [["/examples/" :example-id] :example]]]]
-        (is (= "https://example.com/examples/123{?first,second}"
-              (hypermedia/parameterised-url-for request routes :example
-                [:first :second]
-                :example-id 123)))))))
