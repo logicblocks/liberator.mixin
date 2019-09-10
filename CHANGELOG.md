@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.16] — 2019-09-10
 ### Fixed
 - Bug in `jason` library.
 
@@ -62,4 +64,5 @@ Released without _CHANGELOG.md_.
 [0.0.11]: https://github.com/b-social/liberator-mixin/compare/0.0.10...0.0.11
 [0.0.14]: https://github.com/b-social/liberator-mixin/compare/0.0.11...0.0.14
 [0.0.15]: https://github.com/b-social/liberator-mixin/compare/0.0.14...0.0.15
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.15...HEAD
+[0.0.16]: https://github.com/b-social/liberator-mixin/compare/0.0.15...0.0.16
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.16...HEAD
