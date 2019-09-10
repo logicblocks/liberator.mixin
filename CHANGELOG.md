@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.18] — 2019-09-10
 ### Removed
 - URL generating functions from `liberator-mixin.hypermedia`. `hype` now
   supersedes them.
@@ -73,4 +75,5 @@ Released without _CHANGELOG.md_.
 [0.0.15]: https://github.com/b-social/liberator-mixin/compare/0.0.14...0.0.15
 [0.0.16]: https://github.com/b-social/liberator-mixin/compare/0.0.15...0.0.16
 [0.0.17]: https://github.com/b-social/liberator-mixin/compare/0.0.16...0.0.17
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.17...HEAD
+[0.0.18]: https://github.com/b-social/liberator-mixin/compare/0.0.17...0.0.18
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.18...HEAD
