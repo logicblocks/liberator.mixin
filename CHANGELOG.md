@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Fixed
+- Bug in `jason` library.
 
 ## [0.0.15] — 2019-09-10
 

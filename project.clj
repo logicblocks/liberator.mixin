@@ -10,7 +10,7 @@
                  [camel-snake-kebab "672421b575737c5496b7ddcfb83cf150b0d0bc75"]
                  [clj-time "0.15.1"]
                  [bidi "2.1.6"]
-                 [b-social/jason "0.1.1"]]
+                 [b-social/jason "0.1.2"]]
 
   :middleware [lein-git-down.plugin/inject-properties]
 
