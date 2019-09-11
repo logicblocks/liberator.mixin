@@ -8,6 +8,9 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Validator mixin to return map by default and look for error-representation
+  function on context to allow overriding and to decouple from HAL. 
 
 ## [0.0.19] — 2019-09-11
 ### Changed

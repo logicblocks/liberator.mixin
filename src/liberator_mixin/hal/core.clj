@@ -33,12 +33,23 @@
 (defmethod r/render-map-generic hal-media-type [data _]
   (->wire-json data))
 
+(defmethod r/render-seq-generic hal-media-type [data _]
+  (->wire-json data))
+
 (defn with-hal-media-type []
   {:available-media-types
    [hal-media-type]
 
    :service-available?
    {:representation {:media-type hal-media-type}}})
+
+(defn with-hal-error-representation []
+  {:error-representation
+   (fn [{:keys [self error-id error-context]}]
+     (->
+       (hal/new-resource self)
+       (hal/add-property :error-id error-id)
+       (hal/add-property :error-context error-context)))})
 
 (defn with-exception-handler []
   {:handle-exception
@@ -64,4 +75,5 @@
 
 (defn with-hal-mixin [_]
   [(with-hal-media-type)
+   (with-hal-error-representation)
    (with-not-found-handler)])

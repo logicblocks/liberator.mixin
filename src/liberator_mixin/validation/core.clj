@@ -18,24 +18,29 @@
    [:put :post]
 
    :processable?
-   (fn [context]
-     (if-let [new-validator (get-in context [:resource :validator])]
-       (let [method (get-in context [:request :request-method])
-             validate-methods (get-in context [:resource :validate-methods])]
-         (if (some #(= method %) (validate-methods))
+   (fn [{:keys [resource request] :as context}]
+     (if-let [new-validator (get resource :validator)]
+       (let [validate-methods (get resource :validate-methods)
+             request-method (get request :request-method)]
+         (if (some #(= request-method %) (validate-methods))
            (valid? (new-validator) context)
            true))
        true))
 
    :handle-unprocessable-entity
-   (fn [{:keys [self resource] :as context}]
-     (let [new-validator (:validator resource)
+   (fn [{:keys [resource] :as context}]
+     (let [new-validator (get resource :validator)
+           new-error-representation
+           (get resource :error-representation
+             (fn [{:keys [error-id error-context]}]
+               {:error-id error-id :error-context error-context}))
+
            error-id (random-uuid)
            error-context (problems-for (new-validator) context)]
-       (->
-         (hal/new-resource self)
-         (hal/add-property :error-id error-id)
-         (hal/add-property :error-context error-context))))})
+       (new-error-representation
+         (assoc context
+           :error-id error-id
+           :error-context error-context))))})
 
 (defn with-validation-mixin [_]
   (with-validation))
