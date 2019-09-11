@@ -18,7 +18,7 @@
   (if-let [type (get-in request [:headers "content-type"])]
     (seq (re-find #"^application/(.+\+)?json" type))))
 
-(defn- read-json [request decoder]
+(defn- read-json-body [request decoder]
   (if (json-request? request)
     (if-let [body (:body request)]
       (let [body-string (slurp body)]
@@ -26,6 +26,19 @@
           [true (decoder body-string)]
           (catch JsonParseException _
             [false nil]))))))
+
+(defn- read-json-params [request decoder]
+  (letfn [(parse-param [value]
+            (try
+              (decoder value)
+              (catch JsonParseException _
+                value)))]
+    (let [params (:params request)]
+      (if (json-request? request)
+        (into {}
+          (map (fn [[k v]] [k (parse-param v)])
+            params))
+        params))))
 
 (def json-media-type "application/json")
 
@@ -48,13 +61,20 @@
   {:initialize-context
    (fn [{:keys [request json]}]
      (let [decoder (get json :decoder <-wire-json)]
-       (if-let [[valid? json] (read-json request decoder)]
+       (if-let [[valid? json] (read-json-body request decoder)]
          (if valid?
            {:request {:body json}}
            {:malformed? true}))))
 
    :malformed?
    (fn [{:keys [malformed?]}] malformed?)})
+
+(defn with-params-parsed-as-json []
+  {:initialize-context
+   (fn [{:keys [request json]}]
+     (let [decoder (get json :decoder <-wire-json)
+           params (read-json-params request decoder)]
+       {:request {:params ^:replace params}}))})
 
 (defn with-json-mixin [dependencies]
   [(with-json-encoder (get-in dependencies [:json :encoder] ->wire-json))

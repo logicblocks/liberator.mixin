@@ -22,6 +22,7 @@
 
   :profiles {:shared {:dependencies
                       [[org.clojure/clojure "1.10.0"]
+                       [ring/ring-core "1.7.1"]
                        [ring/ring-mock "0.4.0"]
                        [eftest "0.5.8"]]}
              :dev    [:shared {:source-paths ["dev"]

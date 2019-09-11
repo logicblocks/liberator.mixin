@@ -18,35 +18,21 @@
     (resource request)
     (update :body <-wire-json)))
 
-(deftest hypermedia-mixins
-  (testing "with-routes-in-context"
-    (testing "adds routes to the context"
-      (let [routes [["/" :root]]
-            resource (core/build-resource
-                       (hypermedia/with-routes-in-context routes)
-                       {:handle-ok
-                        (fn [{:keys [routes]}]
-                          routes)})
-            response (call-resource
-                       resource
-                       (ring/request :get "/"))]
-        (is (some? (:body response))))))
-
-  (testing "with-self-link"
-    (testing "adds a self link to context"
-      (let [self-link "https://self.example.com"
-            resource (core/build-resource
-                       (json/with-json-media-type)
-                       (hypermedia/with-self-link)
-                       {:self (constantly self-link)
-                        :handle-ok
-                        (fn [{:keys [self]}]
-                          {:self self})})
-            response (call-resource
-                       resource
-                       (ring/header
-                         (ring/request :get "/")
-                         :accept json/json-media-type))]
-        (is (=
-              self-link
-              (get-in response [:body :self])))))))
+(deftest with-self-link
+  (testing "adds a self link to context"
+    (let [self-link "https://self.example.com"
+          resource (core/build-resource
+                     (json/with-json-media-type)
+                     (hypermedia/with-self-link)
+                     {:self (constantly self-link)
+                      :handle-ok
+                      (fn [{:keys [self]}]
+                        {:self self})})
+          response (call-resource
+                     resource
+                     (ring/header
+                       (ring/request :get "/")
+                       :accept json/json-media-type))]
+      (is (=
+            self-link
+            (get-in response [:body :self]))))))

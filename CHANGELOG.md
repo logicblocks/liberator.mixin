@@ -8,9 +8,11 @@ and this project adheres to
 
 
 ## [Unreleased]
+###
+- JSON parameter parsing.
 
 ## [0.0.21] — 2019-09-11
-## Added
+### Added
 - Context mixin for adding arbitrary attributes to the context map.
 - Support for custom encoder and decoder in JSON mixin.
 
