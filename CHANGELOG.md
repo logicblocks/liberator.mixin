@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.22] — 2019-09-11
 ###
 - JSON parameter parsing.
 
@@ -97,4 +99,5 @@ Released without _CHANGELOG.md_.
 [0.0.19]: https://github.com/b-social/liberator-mixin/compare/0.0.18...0.0.19
 [0.0.20]: https://github.com/b-social/liberator-mixin/compare/0.0.19...0.0.20
 [0.0.21]: https://github.com/b-social/liberator-mixin/compare/0.0.20...0.0.21
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.21...HEAD
+[0.0.22]: https://github.com/b-social/liberator-mixin/compare/0.0.21...0.0.22
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.22...HEAD
