@@ -4,7 +4,8 @@
 
     [jason.core :refer [defcoders]]
 
-    [liberator.representation :as r])
+    [liberator.representation :as r]
+    [liberator-mixin.context.core :refer [with-attribute-in-context]])
   (:import
     [com.fasterxml.jackson.core JsonParseException]))
 
@@ -17,37 +18,46 @@
   (if-let [type (get-in request [:headers "content-type"])]
     (seq (re-find #"^application/(.+\+)?json" type))))
 
-(defn- read-json [request]
+(defn- read-json [request decoder]
   (if (json-request? request)
     (if-let [body (:body request)]
       (let [body-string (slurp body)]
         (try
-          [true (<-wire-json body-string)]
+          [true (decoder body-string)]
           (catch JsonParseException _
             [false nil]))))))
 
 (def json-media-type "application/json")
 
-(defmethod r/render-map-generic json-media-type [data _]
-  (->wire-json data))
+(defmethod r/render-map-generic json-media-type [data {:keys [json]}]
+  ((get json :encoder ->wire-json) data))
 
-(defmethod r/render-seq-generic json-media-type [data _]
-  (->wire-json data))
+(defmethod r/render-seq-generic json-media-type [data {:keys [json]}]
+  ((get json :encoder ->wire-json) data))
 
 (defn with-json-media-type []
   {:available-media-types [json-media-type]})
 
+(defn with-json-decoder [decoder]
+  (with-attribute-in-context :json {:decoder decoder}))
+
+(defn with-json-encoder [encoder]
+  (with-attribute-in-context :json {:encoder encoder}))
+
 (defn with-body-parsed-as-json []
   {:initialize-context
-   (fn [{:keys [request]}]
-     (if-let [[valid? json] (read-json request)]
-       (if valid?
-         {:request {:body json}}
-         {:malformed? true})))
+   (fn [{:keys [request json]}]
+     (let [decoder (get json :decoder <-wire-json)]
+       (if-let [[valid? json] (read-json request decoder)]
+         (if valid?
+           {:request {:body json}}
+           {:malformed? true}))))
 
    :malformed?
    (fn [{:keys [malformed?]}] malformed?)})
 
-(defn with-json-mixin [_]
-  [(with-json-media-type)
+(defn with-json-mixin [dependencies]
+  [(with-json-encoder (get-in dependencies [:json :encoder] ->wire-json))
+   (with-json-decoder (get-in dependencies [:json :decoder] <-wire-json))
+   (with-json-media-type)
    (with-body-parsed-as-json)])
