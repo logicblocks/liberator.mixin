@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+## Added
+- Context mixin for adding arbitrary attributes to the context map.
 
 ## [0.0.20] — 2019-09-11
 ### Changed

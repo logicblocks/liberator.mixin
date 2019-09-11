@@ -1,7 +1,6 @@
-(ns liberator-mixin.hypermedia.core)
-
-(defn with-routes-in-context [routes]
-  {:initialize-context (fn [_] {:routes routes})})
+(ns liberator-mixin.hypermedia.core
+  (:require
+    [liberator-mixin.context.core :refer [with-attribute-in-context]]))
 
 (defn with-self-link []
   {:initialize-context
@@ -10,5 +9,5 @@
        {:self (get-self-link context)}))})
 
 (defn with-hypermedia-mixin [dependencies]
-  [(with-routes-in-context (:routes dependencies))
+  [(with-attribute-in-context :routes (:routes dependencies))
    (with-self-link)])
