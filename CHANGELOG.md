@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.20] — 2019-09-11
 ### Changed
 - Validator mixin to return map by default and look for error-representation
   function on context to allow overriding and to decouple from HAL. 
@@ -86,4 +88,5 @@ Released without _CHANGELOG.md_.
 [0.0.17]: https://github.com/b-social/liberator-mixin/compare/0.0.16...0.0.17
 [0.0.18]: https://github.com/b-social/liberator-mixin/compare/0.0.17...0.0.18
 [0.0.19]: https://github.com/b-social/liberator-mixin/compare/0.0.18...0.0.19
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.19...HEAD
+[0.0.20]: https://github.com/b-social/liberator-mixin/compare/0.0.19...0.0.20
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.20...HEAD
