@@ -8,6 +8,9 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Always parse query string as JSON when JSON mixin used, regardless of request
+  Content-Type.
 
 ## [0.0.24] — 2019-09-12
 ### Added

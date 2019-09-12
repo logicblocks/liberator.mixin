@@ -36,11 +36,9 @@
               (catch JsonParseException _
                 value)))]
     (let [params (:params request)]
-      (if (json-request? request)
-        (into {}
-          (map (fn [[k v]] [k (parse-param v)])
-            params))
-        params))))
+      (into {}
+        (map (fn [[k v]] [k (parse-param v)])
+          params)))))
 
 (def json-media-type "application/json")
 
