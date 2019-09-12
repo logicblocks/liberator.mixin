@@ -82,4 +82,5 @@
   [(with-json-encoder (get-in dependencies [:json :encoder] ->wire-json))
    (with-json-decoder (get-in dependencies [:json :decoder] <-wire-json))
    (with-json-media-type)
-   (with-body-parsed-as-json)])
+   (with-body-parsed-as-json)
+   (with-params-parsed-as-json)])

@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Added
+- JSON parameter parsing as part of the default JSON mixin.
 
 ## [0.0.23] — 2019-09-12
 ### Added
