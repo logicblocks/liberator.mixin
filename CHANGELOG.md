@@ -8,9 +8,11 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Added
+- JSON parameter parsing for multi-valued parameters.
 
 ## [0.0.22] — 2019-09-11
-###
+### Added
 - JSON parameter parsing.
 
 ## [0.0.21] — 2019-09-11

@@ -42,9 +42,11 @@
   (fn [context]
     (letfn [(execute-and-update [context f]
               (liberator/update-context context (f context)))]
-      (-> context
-        (execute-and-update (liberator-util/make-function left))
-        (execute-and-update (liberator-util/make-function right))))))
+      (let [left-result (execute-and-update context
+                          (liberator-util/make-function left))
+            right-result (execute-and-update left-result
+                           (liberator-util/make-function right))]
+        right-result))))
 
 (defn merge-handlers [left right]
   ; TODO: Can we do better than this

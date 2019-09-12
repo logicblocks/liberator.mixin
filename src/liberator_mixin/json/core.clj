@@ -30,7 +30,9 @@
 (defn- read-json-params [request decoder]
   (letfn [(parse-param [value]
             (try
-              (decoder value)
+              (if (coll? value)
+                (into (empty value) (map parse-param value))
+                (decoder value))
               (catch JsonParseException _
                 value)))]
     (let [params (:params request)]
@@ -74,7 +76,7 @@
    (fn [{:keys [request json]}]
      (let [decoder (get json :decoder <-wire-json)
            params (read-json-params request decoder)]
-       {:request {:params ^:replace params}}))})
+       {:request {:params (with-meta params {:replace true})}}))})
 
 (defn with-json-mixin [dependencies]
   [(with-json-encoder (get-in dependencies [:json :encoder] ->wire-json))
