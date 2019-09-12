@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.25] — 2019-09-12
 ### Changed
 - Always parse query string as JSON when JSON mixin used, regardless of request
   Content-Type.
@@ -113,4 +115,5 @@ Released without _CHANGELOG.md_.
 [0.0.22]: https://github.com/b-social/liberator-mixin/compare/0.0.21...0.0.22
 [0.0.23]: https://github.com/b-social/liberator-mixin/compare/0.0.22...0.0.23
 [0.0.24]: https://github.com/b-social/liberator-mixin/compare/0.0.23...0.0.24
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.24...HEAD
+[0.0.25]: https://github.com/b-social/liberator-mixin/compare/0.0.24...0.0.25
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.25...HEAD
