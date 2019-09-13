@@ -36,7 +36,7 @@
     problems-for-response))
 
 (defn new-mock-validator [valid-response problems-for-response]
-  (->MockValidator valid-response problems-for-response))
+  (fn [_] (->MockValidator valid-response problems-for-response)))
 
 (deftest with-validation
   (testing "does nothing when the validator is not set"

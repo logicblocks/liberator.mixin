@@ -23,7 +23,7 @@
        (let [validate-methods (get resource :validate-methods)
              request-method (get request :request-method)]
          (if (some #(= request-method %) (validate-methods))
-           (valid? (new-validator) context)
+           (valid? (new-validator context) context)
            true))
        true))
 
@@ -36,7 +36,7 @@
                {:error-id error-id :error-context error-context}))
 
            error-id (random-uuid)
-           error-context (problems-for (new-validator) context)]
+           error-context (problems-for (new-validator context) context)]
        (new-error-representation
          (assoc context
            :error-id error-id

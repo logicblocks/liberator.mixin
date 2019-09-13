@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Validator constructor is now invoked with context.
 
 ## [0.0.25] — 2019-09-12
 ### Changed
