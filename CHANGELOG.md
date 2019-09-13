@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.26] — 2019-09-13
 ### Changed
 - Validator constructor is now invoked with context.
 
@@ -118,4 +120,5 @@ Released without _CHANGELOG.md_.
 [0.0.23]: https://github.com/b-social/liberator-mixin/compare/0.0.22...0.0.23
 [0.0.24]: https://github.com/b-social/liberator-mixin/compare/0.0.23...0.0.24
 [0.0.25]: https://github.com/b-social/liberator-mixin/compare/0.0.24...0.0.25
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.25...HEAD
+[0.0.26]: https://github.com/b-social/liberator-mixin/compare/0.0.25...0.0.26
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.26...HEAD
