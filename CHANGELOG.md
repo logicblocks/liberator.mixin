@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Update Clojure test dependency to 1.10.1.
 
 ## [0.0.26] — 2019-09-13
 ### Changed
