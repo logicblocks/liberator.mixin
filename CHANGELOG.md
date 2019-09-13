@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.27] — 2019-09-13
 ### Changed
 - Update Clojure test dependency to 1.10.1.
 
@@ -123,4 +125,5 @@ Released without _CHANGELOG.md_.
 [0.0.24]: https://github.com/b-social/liberator-mixin/compare/0.0.23...0.0.24
 [0.0.25]: https://github.com/b-social/liberator-mixin/compare/0.0.24...0.0.25
 [0.0.26]: https://github.com/b-social/liberator-mixin/compare/0.0.25...0.0.26
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.26...HEAD
+[0.0.27]: https://github.com/b-social/liberator-mixin/compare/0.0.26...0.0.27
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.27...HEAD
