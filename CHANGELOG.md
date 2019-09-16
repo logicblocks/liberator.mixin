@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.28] — 2019-09-16
 ### Changed
 - Update jason to latest version.
 
@@ -128,4 +130,5 @@ Released without _CHANGELOG.md_.
 [0.0.25]: https://github.com/b-social/liberator-mixin/compare/0.0.24...0.0.25
 [0.0.26]: https://github.com/b-social/liberator-mixin/compare/0.0.25...0.0.26
 [0.0.27]: https://github.com/b-social/liberator-mixin/compare/0.0.26...0.0.27
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.27...HEAD
+[0.0.28]: https://github.com/b-social/liberator-mixin/compare/0.0.27...0.0.28
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.28...HEAD
