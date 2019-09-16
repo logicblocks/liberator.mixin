@@ -10,21 +10,16 @@
     [ring.middleware.params :as params]
     [ring.middleware.keyword-params :as keyword-params]
 
-    [jason.core :as jason :refer [defcoders]]
+    [jason.core :as jason]
+    [jason.convenience :as jason-conv]
 
     [liberator-mixin.core :as l]
     [liberator-mixin.json.core :as json]))
 
-(declare
-  ->wire-json
-  <-wire-json)
-
-(defcoders wire)
-
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body <-wire-json)))
+    (update :body jason-conv/<-wire-json)))
 
 (deftest default-json-encoding
   (testing "produces camel case meta preserving JSON by default"
@@ -87,7 +82,7 @@
                     (ring/request :post "/")
                     (ring/header "Accept" json/json-media-type)
                     (ring/header "Content-Type" json/json-media-type)
-                    (ring/body (->wire-json {:key "value"})))
+                    (ring/body (jason-conv/->wire-json {:key "value"})))
           response (call-resource resource request)]
       (is (= 201 (:status response)))
       (is (=
@@ -95,34 +90,34 @@
             (:body response))))))
 
 (deftest with-params-parsed-as-json
-  #_(testing "parses simple JSON params"
-      (let [resource
-            (->
-              (l/build-resource
-                (json/with-json-media-type)
-                (json/with-params-parsed-as-json)
-                {:allowed-methods
-                 [:get]
+  (testing "parses simple JSON params"
+    (let [resource
+          (->
+            (l/build-resource
+              (json/with-json-media-type)
+              (json/with-params-parsed-as-json)
+              {:allowed-methods
+               [:get]
 
-                 :handle-ok
-                 (fn [{:keys [request]}]
-                   (let [params (:params request)]
-                     {:correct-params
-                      (and
-                        (= (:thing1 params) [1 2 3])
-                        (= (:thing2 params)
-                          {:key-1 "value"}))}))})
-              (keyword-params/wrap-keyword-params)
-              (params/wrap-params))
-            request (->
-                      (ring/request :get "/")
-                      (ring/header "Content-Type" json/json-media-type)
-                      (ring/query-string
-                        "thing1=[1,2,3]&thing2={\"key1\":\"value\"}"))
-            response (call-resource resource request)]
-        (is (= 200 (:status response)))
-        (is (= {:correct-params true}
-              (:body response)))))
+               :handle-ok
+               (fn [{:keys [request]}]
+                 (let [params (:params request)]
+                   {:correct-params
+                    (and
+                      (= (:thing1 params) [1 2 3])
+                      (= (:thing2 params)
+                        {:key-1 "value"}))}))})
+            (keyword-params/wrap-keyword-params)
+            (params/wrap-params))
+          request (->
+                    (ring/request :get "/")
+                    (ring/header "Content-Type" json/json-media-type)
+                    (ring/query-string
+                      "thing1=[1,2,3]&thing2={\"key1\":\"value\"}"))
+          response (call-resource resource request)]
+      (is (= 200 (:status response)))
+      (is (= {:correct-params true}
+            (:body response)))))
 
   (testing "parses multi-valued JSON params"
     (let [resource
@@ -174,7 +169,7 @@
                     (ring/request :post "/")
                     (ring/header "Accept" json/json-media-type)
                     (ring/header "Content-Type" json/json-media-type)
-                    (ring/body (->wire-json {:some-key "value"})))
+                    (ring/body (jason-conv/->wire-json {:some-key "value"})))
           response (call-resource resource request)]
       (is (= 201 (:status response)))
       (is (= {:received-correct-body true}
@@ -201,7 +196,7 @@
                     (ring/request :post "/")
                     (ring/header "Accept" json/json-media-type)
                     (ring/header "Content-Type" json/json-media-type)
-                    (ring/body (->wire-json {:request "value"})))
+                    (ring/body (jason-conv/->wire-json {:request "value"})))
           response (resource request)]
       (is (= 201 (:status response)))
       (is (= "{\"some_key\":\"value\"}"
@@ -232,7 +227,5 @@
           response (resource request)]
       (is (= 201 (:status response)))
       (is (= (str
-               "{\n"
-               "  \"correct_request\" : true\n"
-               "}")
+               "{\"correct_request\":true}")
             (:body response))))))

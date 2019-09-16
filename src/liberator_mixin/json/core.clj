@@ -2,17 +2,12 @@
   (:require
     [clojure.string :refer [starts-with?]]
 
-    [jason.core :refer [defcoders]]
+    [jason.convenience :as jason-conv]
 
     [liberator.representation :as r]
     [liberator-mixin.context.core :refer [with-attribute-in-context]])
   (:import
     [com.fasterxml.jackson.core JsonParseException]))
-
-(declare
-  ->wire-json
-  <-wire-json)
-(defcoders wire)
 
 (defn- json-request? [request]
   (if-let [type (get-in request [:headers "content-type"])]
@@ -43,10 +38,10 @@
 (def json-media-type "application/json")
 
 (defmethod r/render-map-generic json-media-type [data {:keys [json]}]
-  ((get json :encoder ->wire-json) data))
+  ((get json :encoder jason-conv/->wire-json) data))
 
 (defmethod r/render-seq-generic json-media-type [data {:keys [json]}]
-  ((get json :encoder ->wire-json) data))
+  ((get json :encoder jason-conv/->wire-json) data))
 
 (defn with-json-media-type []
   {:available-media-types [json-media-type]})
@@ -60,7 +55,7 @@
 (defn with-body-parsed-as-json []
   {:initialize-context
    (fn [{:keys [request json]}]
-     (let [decoder (get json :decoder <-wire-json)]
+     (let [decoder (get json :decoder jason-conv/<-wire-json)]
        (if-let [[valid? json] (read-json-body request decoder)]
          (if valid?
            {:request {:body json}}
@@ -72,13 +67,15 @@
 (defn with-params-parsed-as-json []
   {:initialize-context
    (fn [{:keys [request json]}]
-     (let [decoder (get json :decoder <-wire-json)
+     (let [decoder (get json :decoder jason-conv/<-wire-json)
            params (read-json-params request decoder)]
        {:request {:params (with-meta params {:replace true})}}))})
 
 (defn with-json-mixin [dependencies]
-  [(with-json-encoder (get-in dependencies [:json :encoder] ->wire-json))
-   (with-json-decoder (get-in dependencies [:json :decoder] <-wire-json))
+  [(with-json-encoder
+     (get-in dependencies [:json :encoder] jason-conv/->wire-json))
+   (with-json-decoder
+     (get-in dependencies [:json :decoder] jason-conv/<-wire-json))
    (with-json-media-type)
    (with-body-parsed-as-json)
    (with-params-parsed-as-json)])

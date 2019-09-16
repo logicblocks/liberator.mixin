@@ -4,19 +4,16 @@
 
     [ring.mock.request :as ring]
 
-    [jason.core :refer [defcoders]]
+    [jason.convenience :as jason-conv]
 
     [liberator-mixin.core :as core]
     [liberator-mixin.json.core :as json]
     [liberator-mixin.hypermedia.core :as hypermedia]))
 
-(declare <-wire-json)
-(defcoders wire)
-
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body <-wire-json)))
+    (update :body jason-conv/<-wire-json)))
 
 (deftest with-self-link
   (testing "adds a self link to context"

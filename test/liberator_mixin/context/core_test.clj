@@ -2,7 +2,7 @@
   (:require
     [clojure.test :refer :all]
 
-    [jason.core :refer [defcoders]]
+    [jason.convenience :as jason-conv]
 
     [ring.mock.request :as ring]
 
@@ -10,16 +10,10 @@
     [liberator-mixin.context.core :as context]
     [liberator-mixin.json.core :as json]))
 
-(declare
-  ->wire-json
-  <-wire-json)
-
-(defcoders wire)
-
 (defn call-resource [resource request]
   (->
     (resource request)
-    (update :body <-wire-json)))
+    (update :body jason-conv/<-wire-json)))
 
 (deftest with-dependency-in-context
   (testing "adds provided dependency to the context"

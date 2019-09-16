@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Update jason to latest version.
 
 ## [0.0.27] — 2019-09-13
 ### Changed

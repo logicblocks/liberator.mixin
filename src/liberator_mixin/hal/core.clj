@@ -5,7 +5,7 @@
 
     [hype.core :as hype]
 
-    [jason.core :as jason]
+    [jason.convenience :as jason-conv]
 
     [liberator.representation :as r]
     [liberator-mixin.logging.core :as log])
@@ -18,8 +18,6 @@
 
 (def hal-media-type "application/hal+json")
 
-(def ^:private ->wire-json (jason/new-json-encoder))
-
 (extend-protocol r/Representation
   Resource
   (as-response [data {:keys [request routes] :as context}]
@@ -31,10 +29,10 @@
       context)))
 
 (defmethod r/render-map-generic hal-media-type [data _]
-  (->wire-json data))
+  (jason-conv/->wire-json data))
 
 (defmethod r/render-seq-generic hal-media-type [data _]
-  (->wire-json data))
+  (jason-conv/->wire-json data))
 
 (defn with-hal-media-type []
   {:available-media-types

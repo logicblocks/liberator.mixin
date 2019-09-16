@@ -7,7 +7,7 @@
 
   :dependencies [[liberator "0.15.3"]
                  [halboy "5.1.0"]
-                 [b-social/jason "0.1.2"]
+                 [b-social/jason "0.1.3"]
                  [b-social/hype "0.0.17"]]
 
   :plugins [[lein-cloverage "1.0.13"]
