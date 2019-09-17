@@ -45,6 +45,26 @@
       (is (= 200 (:status response)))
       (is (= "OK" (get-in response [:body :status])))))
 
+  (testing "validates all known methods (except options) by default"
+    (doseq [method #{:get :head :put :patch :spinach}]
+      (let [resource
+            (core/build-resource
+              (json/with-json-media-type)
+              (validation/with-validation)
+              {:known-methods   [:get :head :put :patch :options :spinach]
+               :allowed-methods [:get :head :put :patch :options :spinach]
+               :validator       (new-mock-validator false nil)}
+              {:handle-created (constantly {:status "OK"})
+               :handle-ok      (constantly {:status "OK"})})
+            response (call-resource
+                       resource
+                       (->
+                         (ring/request method "/")
+                         (ring/header :content-type json/json-media-type)
+                         (ring/body {:key "value"})))]
+        (is (= 422 (:status response))
+          (str "Method: " method)))))
+
   (testing "does not validate request if not included in validate-methods"
     (let [resource (core/build-resource
                      (json/with-json-media-type)

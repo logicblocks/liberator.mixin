@@ -15,14 +15,14 @@
 
 (defn with-validation []
   {:validate-methods
-   [:put :post]
+   (fn [{:keys [resource]}] ((:known-methods resource)))
 
    :processable?
    (fn [{:keys [resource request] :as context}]
      (if-let [new-validator (get resource :validator)]
        (let [validate-methods (get resource :validate-methods)
              request-method (get request :request-method)]
-         (if (some #(= request-method %) (validate-methods))
+         (if (some #(= request-method %) (validate-methods context))
            (valid? (new-validator context) context)
            true))
        true))

@@ -8,6 +8,9 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Validate all known, validatable methods by default in 
+  `liberator-mixin.validation`.
 
 ## [0.0.28] — 2019-09-16
 ### Changed
