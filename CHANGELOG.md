@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.29] — 2019-09-17
 ### Changed
 - Validate all known, validatable methods by default in 
   `liberator-mixin.validation`.
@@ -134,4 +136,5 @@ Released without _CHANGELOG.md_.
 [0.0.26]: https://github.com/b-social/liberator-mixin/compare/0.0.25...0.0.26
 [0.0.27]: https://github.com/b-social/liberator-mixin/compare/0.0.26...0.0.27
 [0.0.28]: https://github.com/b-social/liberator-mixin/compare/0.0.27...0.0.28
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.28...HEAD
+[0.0.29]: https://github.com/b-social/liberator-mixin/compare/0.0.28...0.0.29
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.29...HEAD
