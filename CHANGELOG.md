@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.30] — 2019-09-17
 ### Added
 - `FnBackedValidator` and factory function to simplify building `Validator`
   instances from existing functions. 
@@ -140,4 +142,5 @@ Released without _CHANGELOG.md_.
 [0.0.27]: https://github.com/b-social/liberator-mixin/compare/0.0.26...0.0.27
 [0.0.28]: https://github.com/b-social/liberator-mixin/compare/0.0.27...0.0.28
 [0.0.29]: https://github.com/b-social/liberator-mixin/compare/0.0.28...0.0.29
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.29...HEAD
+[0.0.30]: https://github.com/b-social/liberator-mixin/compare/0.0.29...0.0.30
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.30...HEAD
