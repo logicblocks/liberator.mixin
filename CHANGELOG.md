@@ -8,6 +8,9 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Added
+- `FnBackedValidator` and factory function to simplify building `Validator`
+  instances from existing functions. 
 
 ## [0.0.29] — 2019-09-17
 ### Changed

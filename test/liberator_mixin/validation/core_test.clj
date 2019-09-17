@@ -20,17 +20,17 @@
     (resource request)
     (update :body jason-conv/<-wire-json)))
 
-(deftype MockValidator [valid-response problems-for-response]
-  validation/Validator
-  (valid? [_ context]
-    (assert-valid-context context)
-    valid-response)
-  (problems-for [_ context]
-    (assert-valid-context context)
-    problems-for-response))
-
 (defn new-mock-validator [valid-response problems-for-response]
-  (fn [_] (->MockValidator valid-response problems-for-response)))
+  (validation/validator
+    :valid-fn
+    (fn [context]
+      (assert-valid-context context)
+      valid-response)
+
+    :problems-for-fn
+    (fn [context]
+      (assert-valid-context context)
+      problems-for-response)))
 
 (deftest with-validation
   (testing "does nothing when the validator is not set"

@@ -13,6 +13,14 @@
   (valid? [_ m])
   (problems-for [_ m]))
 
+(defrecord FnBackedValidator [valid-fn problems-for-fn]
+  Validator
+  (valid? [_ context] (valid-fn context))
+  (problems-for [_ context] (problems-for-fn context)))
+
+(defn validator [& {:as options}]
+  (map->FnBackedValidator options))
+
 (defn with-validation []
   {:validate-methods
    (fn [{:keys [resource]}] ((:known-methods resource)))
