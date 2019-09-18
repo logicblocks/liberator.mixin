@@ -28,11 +28,13 @@
    :processable?
    (fn [{:keys [resource request] :as context}]
      (if-let [new-validator (get resource :validator)]
-       (let [validate-methods (get resource :validate-methods)
-             request-method (get request :request-method)]
-         (if (some #(= request-method %) (validate-methods context))
-           (valid? (new-validator context) context)
-           true))
+       (if-let [validator (new-validator context)]
+         (let [validate-methods (get resource :validate-methods)
+               request-method (get request :request-method)]
+           (if (some #(= request-method %) (validate-methods context))
+             (valid? validator context)
+             true))
+         true)
        true))
 
    :handle-unprocessable-entity

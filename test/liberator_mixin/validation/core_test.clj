@@ -6,6 +6,7 @@
 
     [jason.convenience :as jason-conv]
 
+    [liberator.util :refer [by-method]]
     [liberator-mixin.core :as core]
     [liberator-mixin.json.core :as json]
     [liberator-mixin.validation.core :as validation]))
@@ -97,6 +98,23 @@
                        (ring/header :content-type json/json-media-type)
                        (ring/body {:key "value"})))]
       (is (= 201 (:status response)))))
+
+  (testing "does not validate when no validator for method"
+    (let [resource (core/build-resource
+                     (json/with-json-media-type)
+                     (validation/with-validation)
+                     {:allowed-methods [:post :get]
+                      :validator       (by-method
+                                         :post (new-mock-validator false nil))}
+                     {:handle-ok
+                      (constantly {:status "OK"})})
+          response (call-resource
+                     resource
+                     (->
+                       (ring/request :get "/")
+                       (ring/header :content-type json/json-media-type)
+                       (ring/body {:key "value"})))]
+      (is (= 200 (:status response)))))
 
   (testing "describes validation failures"
     (let [resource (core/build-resource

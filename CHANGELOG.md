@@ -8,6 +8,10 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Changed
+- Allow `nil` validators in `liberator-mixin.validation` so that validator can
+  be something like `(by-method :post (validator))` in a resource that supports 
+  both GET and POST requests.
 
 ## [0.0.30] — 2019-09-17
 ### Added
