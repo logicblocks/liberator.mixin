@@ -451,9 +451,9 @@
      :expected-left-context nil
      :expected-right-context nil
      :result [true {:first [1 2 3 4 5 6]
-                     :second "second"
-                     :third "third"
-                     :fourth "fourth"}])
+                    :second "second"
+                    :third "third"
+                    :fourth "fourth"}])
 
    (merge-test
      :description (str "combines left and second slot of right with context "
@@ -477,9 +477,9 @@
      :expected-left-context nil
      :expected-right-context nil
      :result [false {:first [1 2 3 4 5 6]
-                    :second "second"
-                    :third "third"
-                    :fourth "fourth"}])
+                     :second "second"
+                     :third "third"
+                     :fourth "fourth"}])
 
    (merge-test
      :description (str "combines second slot of left and right with context "
@@ -490,9 +490,9 @@
      :expected-left-context nil
      :expected-right-context nil
      :result [true {:first [1 2 3 4 5 6]
-                     :second "second"
-                     :third "third"
-                     :fourth "fourth"}])
+                    :second "second"
+                    :third "third"
+                    :fourth "fourth"}])
 
    (merge-test
      :description (str "combines second slot of left and right with context "

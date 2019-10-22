@@ -8,6 +8,9 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Added
+- Documentation to `liberator-mixin.context`. 
+- `liberator-mixin.context/with-attributes-in-context`.
 
 ## [0.0.32] — 2019-10-22
 ### Added
