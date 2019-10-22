@@ -8,6 +8,8 @@ and this project adheres to
 
 
 ## [Unreleased]
+
+## [0.0.33] — 2019-10-22
 ### Added
 - Documentation to `liberator-mixin.context`. 
 - `liberator-mixin.context/with-attributes-in-context`.
@@ -166,4 +168,5 @@ Released without _CHANGELOG.md_.
 [0.0.30]: https://github.com/b-social/liberator-mixin/compare/0.0.29...0.0.30
 [0.0.31]: https://github.com/b-social/liberator-mixin/compare/0.0.30...0.0.31
 [0.0.32]: https://github.com/b-social/liberator-mixin/compare/0.0.31...0.0.32
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.32...HEAD
+[0.0.33]: https://github.com/b-social/liberator-mixin/compare/0.0.32...0.0.33
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.33...HEAD
