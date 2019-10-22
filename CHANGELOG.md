@@ -8,6 +8,16 @@ and this project adheres to
 
 
 ## [Unreleased]
+### Added
+- Documentation to `liberator-mixin.core`.
+- More test coverage to `liberator-mixin.core/merge-decisions`
+  and `liberator-mixin.core/merge-resource-definitions`.
+
+### Fixed
+- Issue with merging decisions that result in only context update maps.
+- Issue with merging liberator decisions where when `left` is `false`,
+  no merge would take place during 
+  `liberator-mixin.core/merge-resource-definitions`. 
 
 ## [0.0.31] — 2019-09-18
 ### Changed

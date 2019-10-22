@@ -8,7 +8,7 @@
   :dependencies [[liberator "0.15.3"]
                  [halboy "5.1.0"]
                  [b-social/jason "0.1.3"]
-                 [b-social/hype "0.0.17"]]
+                 [b-social/hype "1.0.0"]]
 
   :plugins [[lein-cloverage "1.0.13"]
             [lein-shell "0.5.0"]
@@ -34,6 +34,7 @@
 
   :codox
   {:namespaces  [#"^liberator-mixin\."]
+   :metadata    {:doc/format :markdown}
    :output-path "docs"
    :doc-paths   ["docs"]
    :source-uri  "https://github.com/b-social/liberator-mixin/blob/{version}/{filepath}#L{line}"}

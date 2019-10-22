@@ -401,7 +401,111 @@
      :expected-right-context nil
      :result [true {:first [1 2 3 4 5 6]
                     :second "second"
-                    :third "third"}])])
+                    :third "third"}])
+
+   (merge-test
+     :description (str "combines left with context when left is map and right "
+                    "is true")
+     :context {:first [1 2] :second "second"}
+     :left-attribute {:first [3 4] :third "third"}
+     :right-attribute true
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [true {:first [1 2 3 4] :second "second" :third "third"}])
+
+   (merge-test
+     :description (str "combines right with context when left is true and "
+                    "right is map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute true
+     :right-attribute {:first [3 4] :third "third"}
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [true {:first [1 2 3 4] :second "second" :third "third"}])
+
+   (merge-test
+     :description (str "combines right with context when left is false and "
+                    "right is map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute false
+     :right-attribute {:first [3 4] :third "third"}
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [false {:first [1 2 3 4] :second "second" :third "third"}])
+
+   (merge-test
+     :description (str "combines left with context when right is false and "
+                    "left is map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute {:first [3 4] :third "third"}
+     :right-attribute false
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [false {:first [1 2 3 4] :second "second" :third "third"}])
+
+   (merge-test
+     :description "combines left and right with context when both are maps"
+     :context {:first [1 2] :second "second"}
+     :left-attribute {:first [3 4] :third "third"}
+     :right-attribute {:first [5 6] :fourth "fourth"}
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [true {:first [1 2 3 4 5 6]
+                     :second "second"
+                     :third "third"
+                     :fourth "fourth"}])
+
+   (merge-test
+     :description (str "combines left and second slot of right with context "
+                    "when left is map and right is vector of true and map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute {:first [3 4] :third "third"}
+     :right-attribute [true {:first [5 6] :fourth "fourth"}]
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [true {:first [1 2 3 4 5 6]
+                    :second "second"
+                    :third "third"
+                    :fourth "fourth"}])
+
+   (merge-test
+     :description (str "combines left and second slot of right with context "
+                    "when left is map and right is vector of false and map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute {:first [3 4] :third "third"}
+     :right-attribute [false {:first [5 6] :fourth "fourth"}]
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [false {:first [1 2 3 4 5 6]
+                    :second "second"
+                    :third "third"
+                    :fourth "fourth"}])
+
+   (merge-test
+     :description (str "combines second slot of left and right with context "
+                    "when left is vector of true and map and right is map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute [true {:first [3 4] :third "third"}]
+     :right-attribute {:first [5 6] :fourth "fourth"}
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [true {:first [1 2 3 4 5 6]
+                     :second "second"
+                     :third "third"
+                     :fourth "fourth"}])
+
+   (merge-test
+     :description (str "combines second slot of left and right with context "
+                    "when left is vector of false and map and right is map")
+     :context {:first [1 2] :second "second"}
+     :left-attribute [false {:first [3 4] :third "third"}]
+     :right-attribute {:first [5 6] :fourth "fourth"}
+     :expected-left-context nil
+     :expected-right-context nil
+     :result [false {:first [1 2 3 4 5 6]
+                     :second "second"
+                     :third "third"
+                     :fourth "fourth"}])])
 
 (deftest merge-decisions
   (doseq [decision-test decision-tests]
