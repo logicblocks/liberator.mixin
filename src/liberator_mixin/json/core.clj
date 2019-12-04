@@ -71,11 +71,13 @@
            params (read-json-params request decoder)]
        {:request {:params (with-meta params {:replace true})}}))})
 
-(defn with-json-mixin [dependencies]
-  [(with-json-encoder
-     (get-in dependencies [:json :encoder] jason-conv/->wire-json))
-   (with-json-decoder
-     (get-in dependencies [:json :decoder] jason-conv/<-wire-json))
-   (with-json-media-type)
-   (with-body-parsed-as-json)
-   (with-params-parsed-as-json)])
+(defn with-json-mixin
+  ([] (with-json-mixin {}))
+  ([dependencies]
+    [(with-json-encoder
+       (get-in dependencies [:json :encoder] jason-conv/->wire-json))
+     (with-json-decoder
+       (get-in dependencies [:json :decoder] jason-conv/<-wire-json))
+     (with-json-media-type)
+     (with-body-parsed-as-json)
+     (with-params-parsed-as-json)]))

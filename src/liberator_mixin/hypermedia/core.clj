@@ -8,6 +8,9 @@
      (when-let [get-self-link (:self resource)]
        {:self (get-self-link context)}))})
 
-(defn with-hypermedia-mixin [dependencies]
-  [(with-attribute-in-context :routes (:routes dependencies))
-   (with-self-link)])
+(defn with-hypermedia-mixin
+  ([] (with-hypermedia-mixin {}))
+  ([dependencies]
+    [(with-attribute-in-context
+       :routes (get dependencies :routes []))
+     (with-self-link)]))

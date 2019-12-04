@@ -12,27 +12,33 @@
       resource serialisation.
     - Adds a default handler responding with an empty HAL resource for
       `:handle-not-found`.
-    - Adds a HAL error representation for use with `liberator-mixin.validation`.
+    - Adds a HAL error representation for use with the
+      [[liberator-mixin.validation.core|validation mixin]].
 
   Depends on:
 
-    - `liberator-mixin.json`,
-    - `liberator-mixin.hypermedia`.
+    - the [[liberator-mixin.json.core|JSON mixin]],
+    - the [[liberator-mixin.hypermedia.core|hypermedia mixin]].
 
   Optionally extends:
 
-    - `liberator-mixin.validation`.
+    - the [[liberator-mixin.validation.core|validation mixin]].
 
   ### JSON serialisation support
 
-
+  The JSON serialisation support for the `application/hal+json` media type uses
+  the same underlying JSON encoder as the
+  [[liberator-mixin.json.core|JSON mixin]]. If that mixin is configured with a
+  custom JSON encoder, all `application/hal+json` responses will use the custom
+  JSON encoder.
 
   ### halboy `Resource` support
 
   The [halboy](https://github.com/jimmythompson/halboy) resource support
   will add a `:discovery` link to any returned resource and expects `bidi`
   `:routes` to be available in the `context`, containing a route named
-  `:discovery`."
+  `:discovery`. The [[liberator-mixin.hypermedia.core|hypermedia mixin]] adds
+  routes to the `context` so nothing further is needed if that mixin is in use."
   (:require
     [halboy.resource :as hal]
     [halboy.json :as haljson]
@@ -64,11 +70,11 @@
         (haljson/resource->map))
       context)))
 
-(defmethod r/render-map-generic hal-media-type [data _]
-  (jason-conv/->wire-json data))
+(defmethod r/render-map-generic hal-media-type [data {:keys [json]}]
+  ((get json :encoder jason-conv/->wire-json) data))
 
-(defmethod r/render-seq-generic hal-media-type [data _]
-  (jason-conv/->wire-json data))
+(defmethod r/render-seq-generic hal-media-type [data {:keys [json]}]
+  ((get json :encoder jason-conv/->wire-json) data))
 
 (defn with-hal-media-type
   "Returns a mixin to add the HAL media type to the available media types."

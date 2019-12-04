@@ -7,7 +7,7 @@
 
   :dependencies [[liberator "0.15.3"]
                  [halboy "5.1.0"]
-                 [b-social/jason "0.1.3"]
+                 [b-social/jason "0.1.4"]
                  [b-social/hype "1.0.0"]]
 
   :plugins [[lein-cloverage "1.0.13"]
@@ -22,6 +22,7 @@
 
   :profiles {:shared {:dependencies
                       [[org.clojure/clojure "1.10.1"]
+                       [camel-snake-kebab "0.4.1"]
                        [ring/ring-core "1.7.1"]
                        [ring/ring-mock "0.4.0"]
                        [eftest "0.5.8"]]}
