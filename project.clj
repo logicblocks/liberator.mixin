@@ -1,4 +1,4 @@
-(defproject b-social/liberator-mixin "0.0.35-SNAPSHOT"
+(defproject b-social/liberator-mixin "0.0.35"
   :description "An extension to liberator allowing for composable mixins."
   :url "https://github.com/b-social/liberator-mixin"
 
@@ -8,7 +8,8 @@
   :dependencies [[liberator "0.15.3"]
                  [halboy "5.1.0"]
                  [b-social/jason "0.1.4"]
-                 [b-social/hype "1.0.0"]]
+                 [b-social/hype "1.0.0"]
+                 [buddy/buddy-auth "2.2.0"]]
 
   :plugins [[lein-cloverage "1.0.13"]
             [lein-shell "0.5.0"]
