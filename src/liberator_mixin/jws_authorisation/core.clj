@@ -3,7 +3,8 @@
   jwt"
   (:require [clojure.string :as str]
     [buddy.auth.http :as http]
-    [buddy.sign.jwt :as jwt])
+    [buddy.sign.jwt :as jwt]
+    [liberator-mixin.json.core :refer [with-json-media-type]])
   (:import [clojure.lang ExceptionInfo]))
 
 (defn- parse-scopes [scope]
@@ -26,11 +27,12 @@
 (defn- is-authorised? [claims required-scopes]
   (if (empty? required-scopes)
     {:authorised true}
-    (if (some? claims)
-      (if-let [scope (:scope claims)]
-        {:authorised (every? (parse-scopes scope) required-scopes)}
+    (if-let [scope (:scope claims)]
+      (if-let [authorised (every? (parse-scopes scope) required-scopes)]
+        {:authorised authorised}
         (to-error
-          "Scope claim does not contain required scopes."
+          (format "Scope claim does not contain required scopes (%s)."
+            (str/join "," required-scopes))
           {:type :authorisation :cause :missing-scopes}))
       (to-error
         "Token does not contain scope claim."
@@ -48,7 +50,8 @@
 
 (defn- missing-token [token]
   {:identity (to-error
-               (format "Message does not contain a %s token." token))})
+               (format "Message does not contain a %s token." token)
+               {:type :validation :cause :token})})
 
 (defn with-jws-authorisation
   "Returns a mixin that validates the jws token ensure it includes the scope
@@ -73,3 +76,24 @@
                              (missing-token token))))
    :authorized?        (fn [{:keys [identity]}]
                          (:authorised identity))})
+
+(defn- cause-to-status
+  [cause]
+  (condp = (:type cause)
+    :authorisation 403
+    :validation 401
+    :else 500))
+
+(defn- with-jws-unauthorised
+  []
+  {:handle-unauthorized (fn [{:keys [identity]}]
+                          (let [{:keys [data]} identity]
+                            (liberator.representation/ring-response
+                              {:status (cause-to-status data)
+                               :body   identity})))})
+
+(defn with-jws-unauthorised-as-json
+  "Returns a mixin that handles jws authentication failures returning the
+detailed error information as json"
+  []
+  [(with-json-media-type) (with-jws-unauthorised)])

@@ -20,6 +20,7 @@
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation ["read"] "foo")
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -37,6 +38,7 @@
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation [] "foo")
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -53,8 +55,8 @@
   (testing "the resource is not authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (json/with-body-parsed-as-json)
                      (jws/with-jws-authorisation ["read"] "foo")
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -65,14 +67,16 @@
                     (str "Bearer " (sign {:scope "write"} "foo")))
           response (call-resource
                      resource
-                     request)]
-      (is (= 401 (:status response)))))
+                     request)
+          body (:body response)]
+      (is (= 403 (:status response)))
+      (is (= "Scope claim does not contain required scopes (read)." (:message body)))))
 
   (testing "the resource does not have scope claim"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (json/with-body-parsed-as-json)
                      (jws/with-jws-authorisation ["read"] "foo")
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -83,14 +87,16 @@
                     (str "Bearer " (sign {} "foo")))
           response (call-resource
                      resource
-                     request)]
-      (is (= 401 (:status response)))))
+                     request)
+          body (:body response)]
+      (is (= 401 (:status response)))
+      (is (= "Token does not contain scope claim." (:message body)))))
 
   (testing "the token is under the wrong identifier"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (json/with-body-parsed-as-json)
                      (jws/with-jws-authorisation ["read"] "foo")
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -101,14 +107,16 @@
                     (str "Token " (sign {:scope "read"} "foo")))
           response (call-resource
                      resource
-                     request)]
-      (is (= 401 (:status response)))))
+                     request)
+          body (:body response)]
+      (is (= 401 (:status response)))
+      (is (= "Message does not contain a Bearer token." (:message body)))))
 
   (testing "the token has expired"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (json/with-body-parsed-as-json)
                      (jws/with-jws-authorisation ["read"] "foo")
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -128,11 +136,11 @@
   (testing "does not meet the required audience"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (json/with-body-parsed-as-json)
                      (jws/with-jws-authorisation
                        ["read"]
                        "foo"
                        :opts {:aud "pms.com"})
+                     (jws/with-jws-unauthorised-as-json)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -145,5 +153,7 @@
                                      "foo")))
           response (call-resource
                      resource
-                     request)]
-      (is (= 401 (:status response))))))
+                     request)
+          body (:body response)]
+      (is (= 401 (:status response)))
+      (is (= "Audience does not match pms.com" (:message body))))))
