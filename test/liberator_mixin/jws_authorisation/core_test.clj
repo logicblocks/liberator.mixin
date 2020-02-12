@@ -109,7 +109,7 @@
                      resource
                      request)
           body (:body response)]
-      (is (= 401 (:status response)))
+      (is (= 400 (:status response)))
       (is (= "Message does not contain a Bearer token." (:message body)))))
 
   (testing "the token has expired"

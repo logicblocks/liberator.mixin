@@ -33,7 +33,7 @@
         (to-error
           (format "Scope claim does not contain required scopes (%s)."
             (str/join "," required-scopes))
-          {:type :authorisation :cause :missing-scopes}))
+          {:type :validation :cause :missing-scopes}))
       (to-error
         "Token does not contain scope claim."
         {:type :validation :cause :scope}))))
@@ -78,18 +78,34 @@
                          (:authorised identity))})
 
 (defn- cause-to-status
-  [cause]
-  (condp = (:type cause)
-    :authorisation 403
-    :validation 401
+  [{:keys [type cause]}]
+  (cond
+    (and (= type :validation) (= cause :token)) 400
+    (and (= type :validation) (= cause :missing-scopes)) 403
+    (= type :validation) 401
     :else 500))
+
+(defn- cause-to-type
+  [{:keys [type cause]}]
+  (cond
+    (and (= type :validation) (= cause :token)) "invalid_request"
+    (and (= type :validation) (= cause :missing-scopes)) "insufficient_scope"
+    (= type :validation) "invalid_token"
+    :else 500))
+
+(defn- cause-to-error [message cause]
+  (str
+    "Bearer,\n"
+    "error=\"" (cause-to-type cause) "\",n"
+    "error_message=\"" message "\"\n"))
 
 (defn- with-jws-unauthorised
   []
   {:handle-unauthorized (fn [{:keys [identity]}]
-                          (let [{:keys [data]} identity]
+                          (let [{:keys [message data]} identity]
                             (liberator.representation/ring-response
                               {:status (cause-to-status data)
+                               :headers {"WWW-Authenticate" (cause-to-error message data)}
                                :body   identity})))})
 
 (defn with-jws-unauthorised-as-json
