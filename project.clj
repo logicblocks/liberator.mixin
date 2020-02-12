@@ -1,4 +1,4 @@
-(defproject b-social/liberator-mixin "0.0.37-SNAPSHOT"
+(defproject b-social/liberator-mixin "0.0.37"
   :description "An extension to liberator allowing for composable mixins."
   :url "https://github.com/b-social/liberator-mixin"
 
