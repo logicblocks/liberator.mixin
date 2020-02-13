@@ -96,7 +96,7 @@
 (defn- cause-to-error [message cause]
   (str
     "Bearer,\n"
-    "error=\"" (cause-to-type cause) "\",n"
+    "error=\"" (cause-to-type cause) "\",\n"
     "error_message=\"" message "\"\n"))
 
 (defn- with-jws-unauthorised
