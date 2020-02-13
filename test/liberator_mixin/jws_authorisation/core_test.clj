@@ -9,11 +9,13 @@
     [buddy.sign.jwt :refer [sign]]
     [liberator-mixin.core :as core]
     [liberator-mixin.jws-authorisation.core :as jws]
-    [liberator-mixin.json.core :as json]))
+    [liberator-mixin.json.core :as json]
+    [jason.convenience :refer [<-wire-json]]))
 
 (defn call-resource [resource request]
   (->
-    (resource request)))
+    (resource request)
+    (update-in [:body] <-wire-json)))
 
 (deftest with-jws-authorisation
   (testing "the resource is authorised with the right scopes available"

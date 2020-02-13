@@ -101,15 +101,23 @@
 
 (defn- with-jws-unauthorised
   []
-  {:handle-unauthorized (fn [{:keys [identity]}]
-                          (let [{:keys [message data]} identity]
-                            (liberator.representation/ring-response
-                              {:status (cause-to-status data)
-                               :headers {"WWW-Authenticate" (cause-to-error message data)}
-                               :body   identity})))})
+  {:authorized?
+   (fn [{:keys [identity]}]
+     (let [authorised? (:authorised identity)]
+       (if (true? authorised?)
+         true
+         [false {:representation {:media-type "application/json"}}])))
+   :handle-unauthorized
+   (fn [{:keys [identity]}]
+     (let [{:keys [message data]} identity]
+       (liberator.representation/ring-response
+         identity
+         {:status  (cause-to-status data)
+          :headers {"WWW-Authenticate" (cause-to-error message data)}})))})
 
 (defn with-jws-unauthorised-as-json
   "Returns a mixin that handles jws authentication failures returning the
 detailed error information as json"
   []
-  [(with-json-media-type) (with-jws-unauthorised)])
+  [(with-json-media-type)
+   (with-jws-unauthorised)])
