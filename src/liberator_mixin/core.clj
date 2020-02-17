@@ -59,13 +59,14 @@
 
   The decisions are applied in the order `left` first, then `right`, such that
   the `right` decision will see any context updates made by the `left`."
-  [left right]
+  [left right comparator]
   (fn [context]
     (letfn [(if-vector? [thing f]
               (if (vector? thing) (f thing) thing))
             (execute-and-update [[result context] f]
               (let [decision (f context)
-                    result (boolean (and result (if-vector? decision first)))
+                    comparison (comparator result (if-vector? decision first))
+                    result (boolean comparison)
                     context-update (if-vector? decision second)
                     context (liberator/update-context context context-update)]
                 [result context]))]
@@ -139,6 +140,25 @@
 
           :otherwise right-conf)))))
 
+(def or-decisions
+  #{:malformed? :can-post-to-gone? :conflict? :existed? :moved-permanently?
+    :moved-temporarily? :multiple-representations?
+    :post-redirect? :put-to-different-url? :respond-with-entity? :uri-too-long?})
+
+(defn or-comparator
+  [left right]
+  (or left right))
+
+(defn and-comparator
+  [left right]
+  (and left right))
+
+(defn get-comparator
+  [decision]
+  (if (contains? or-decisions decision)
+    or-comparator
+    and-comparator))
+
 (defn merge-resource-definitions
   "Merges together multiple liberator resource definitions, specified as maps.
 
@@ -161,7 +181,7 @@
           (let [current (get result k)]
             (assoc result
               k (cond
-                  (is-decision? k) (merge-decisions current override)
+                  (is-decision? k) (merge-decisions current override (get-comparator k))
                   (is-action? k) (merge-actions current override)
                   (is-handler? k) (merge-handlers current override)
                   (is-configuration? k) (merge-configurations current override)

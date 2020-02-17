@@ -1,22 +1,31 @@
 (ns liberator-mixin.test-support)
 
-(def decision-names
+(def decision-names-or
+  [:malformed?
+   :can-post-to-gone?
+   :conflict?
+   :existed?
+   :moved-permanently?
+   :moved-temporarily?
+   :multiple-representations?
+   :post-redirect?
+   :put-to-different-url?
+   :respond-with-entity?
+   :uri-too-long?])
+(def decision-names-and
   [:accept-charset-exists?
    :accept-encoding-exists?
    :accept-exists?
    :accept-language-exists?
    :allowed?
    :authorized?
-   :can-post-to-gone?
    :can-post-to-missing?
    :can-put-to-missing?
    :charset-available?
-   :conflict?
    :delete-enacted?
    :encoding-available?
    :etag-matches-for-if-match?
    :etag-matches-for-if-none?
-   :existed?
    :exists?
    :if-match-exists?
    :if-match-star-exists-for-missing?
@@ -32,7 +41,6 @@
    :known-content-type?
    :known-method?
    :language-available?
-   :malformed?
    :media-type-available?
    :method-allowed?
    :method-delete?
@@ -40,24 +48,17 @@
    :method-post?
    :method-put?
    :modified-since?
-   :moved-permanently?
-   :moved-temporarily?
-   :multiple-representations?
    :new?
    :patch-enacted?
    :post-enacted?
-   :post-redirect?
    :post-to-existing?
    :post-to-gone?
    :post-to-missing?
    :processable?
    :put-enacted?
-   :put-to-different-url?
    :put-to-existing?
-   :respond-with-entity?
    :service-available?
    :unmodified-since?
-   :uri-too-long?
    :valid-content-header?
    :valid-entity-length?])
 
