@@ -65,12 +65,14 @@
               (if (vector? thing) (f thing) thing))
             (execute-and-update [[result context] f]
               (let [decision (f context)
-                    comparison (comparator result (if-vector? decision first))
+                    comparison (if (nil? result)
+                                 (if-vector? decision first)
+                                 (comparator result (if-vector? decision first)))
                     result (boolean comparison)
                     context-update (if-vector? decision second)
                     context (liberator/update-context context context-update)]
                 [result context]))]
-      (-> [true context]
+      (-> [nil context]
         (execute-and-update (liberator-util/make-function left))
         (execute-and-update (liberator-util/make-function right))))))
 
@@ -123,22 +125,22 @@
   (fn merged
     ([] (merged {}))
     ([context]
-      (let [left-conf ((liberator-util/make-function left) context)
-            right-conf ((liberator-util/make-function right) context)]
-        (cond
-          (-> right-conf meta :replace)
-          right-conf
+     (let [left-conf ((liberator-util/make-function left) context)
+           right-conf ((liberator-util/make-function right) context)]
+       (cond
+         (-> right-conf meta :replace)
+         right-conf
 
-          (and (list? left-conf) (coll? right-conf))
-          (apply list (concat right-conf left-conf))
+         (and (list? left-conf) (coll? right-conf))
+         (apply list (concat right-conf left-conf))
 
-          (and (vector? left-conf) (coll? right-conf))
-          (into right-conf left-conf)
+         (and (vector? left-conf) (coll? right-conf))
+         (into right-conf left-conf)
 
-          (and (set? left-conf) (coll? right-conf))
-          (into left-conf right-conf)
+         (and (set? left-conf) (coll? right-conf))
+         (into left-conf right-conf)
 
-          :otherwise right-conf)))))
+         :otherwise right-conf)))))
 
 (def or-decisions
   #{:malformed? :can-post-to-gone? :conflict? :existed? :moved-permanently?

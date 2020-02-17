@@ -714,7 +714,7 @@
               @(get-in action-test [:right :context :actual]))
           (str "right context in " (:description action-test))))))
 
-  (let [and-result (merge-test
+  (let [and-result-1 (merge-test
                      :description "return false from and when true and false"
                      :context {:important "stuff"}
                      :left-attribute (fn [_] true)
@@ -722,49 +722,84 @@
                      :expected-left-context {:important "stuff"}
                      :expected-right-context {:important "stuff"}
                      :result [false {:important "stuff"}])
-        or-result (merge-test
-                    :description "return false from or when true and false"
+        and-result-2 (merge-test
+                       :description "return false from and when false and false"
+                       :context {:important "stuff"}
+                       :left-attribute (fn [_] false)
+                       :right-attribute (fn [_] false)
+                       :expected-left-context {:important "stuff"}
+                       :expected-right-context {:important "stuff"}
+                       :result [false {:important "stuff"}])
+        and-result-3 (merge-test
+                       :description "return true from and when true and true"
+                       :context {:important "stuff"}
+                       :left-attribute (fn [_] true)
+                       :right-attribute (fn [_] true)
+                       :expected-left-context {:important "stuff"}
+                       :expected-right-context {:important "stuff"}
+                       :result [true {:important "stuff"}])
+        or-result-1 (merge-test
+                    :description "return true from or when true and false"
                     :context {:important "stuff"}
                     :left-attribute (fn [_] true)
                     :right-attribute (fn [_] false)
                     :expected-left-context {:important "stuff"}
                     :expected-right-context {:important "stuff"}
-                    :result [true {:important "stuff"}])]
-    (doseq [decision-name ts/decision-names-and]
-      (testing (str "for decision " decision-name " "
-                 (:description and-result))
-        (let [merged (core/merge-resource-definitions
-                       {decision-name
-                        (get-in and-result [:left :attribute])}
-                       {decision-name
-                        (get-in and-result [:right :attribute])})]
-          (is (= (:result and-result)
-                ((get merged decision-name) (:context and-result)))
-            (str "result in " (:description and-result)))
-          (is (= (get-in and-result [:left :context :expected])
-                @(get-in and-result [:left :context :actual]))
-            (str "left context in " (:description and-result)))
-          (is (= (get-in and-result [:right :context :expected])
-                @(get-in and-result [:right :context :actual]))
-            (str "right context in " (:description and-result))))))
+                    :result [true {:important "stuff"}])
+        or-result-2 (merge-test
+                          :description "return false from or when false and false"
+                          :context {:important "stuff"}
+                          :left-attribute (fn [_] false)
+                          :right-attribute (fn [_] false)
+                          :expected-left-context {:important "stuff"}
+                          :expected-right-context {:important "stuff"}
+                          :result [false {:important "stuff"}])
+        or-result-3 (merge-test
+                      :description "return true from or when true and true"
+                      :context {:important "stuff"}
+                      :left-attribute (fn [_] true)
+                      :right-attribute (fn [_] true)
+                      :expected-left-context {:important "stuff"}
+                      :expected-right-context {:important "stuff"}
+                      :result [true {:important "stuff"}])]
 
-    (doseq [decision-name ts/decision-names-or]
+    (doseq [decision-name ts/decision-names-and
+            decision-test [and-result-1 and-result-2 and-result-3]]
       (testing (str "for decision " decision-name " "
-                 (:description or-result))
+                 (:description and-result-1))
         (let [merged (core/merge-resource-definitions
                        {decision-name
-                        (get-in or-result [:left :attribute])}
+                        (get-in decision-test [:left :attribute])}
                        {decision-name
-                        (get-in or-result [:right :attribute])})]
-          (is (= (:result or-result)
-                ((get merged decision-name) (:context or-result)))
-            (str "result in " (:description or-result)))
-          (is (= (get-in or-result [:left :context :expected])
-                @(get-in or-result [:left :context :actual]))
-            (str "left context in " (:description or-result)))
-          (is (= (get-in or-result [:right :context :expected])
-                @(get-in or-result [:right :context :actual]))
-            (str "right context in " (:description or-result)))))))
+                        (get-in decision-test [:right :attribute])})]
+          (is (= (:result decision-test)
+                ((get merged decision-name) (:context decision-test)))
+            (str "result in " (:description decision-test)))
+          (is (= (get-in decision-test [:left :context :expected])
+                @(get-in decision-test [:left :context :actual]))
+            (str "left context in " (:description decision-test)))
+          (is (= (get-in decision-test [:right :context :expected])
+                @(get-in decision-test [:right :context :actual]))
+            (str "right context in " (:description decision-test))))))
+
+    (doseq [decision-name ts/decision-names-or
+            decision-test [or-result-1 or-result-2 or-result-3]]
+      (testing (str "for decision " decision-name " "
+                 (:description decision-test))
+        (let [merged (core/merge-resource-definitions
+                       {decision-name
+                        (get-in decision-test [:left :attribute])}
+                       {decision-name
+                        (get-in decision-test [:right :attribute])})]
+          (is (= (:result decision-test)
+                ((get merged decision-name) (:context decision-test)))
+            (str "result in " (:description decision-test)))
+          (is (= (get-in decision-test [:left :context :expected])
+                @(get-in decision-test [:left :context :actual]))
+            (str "left context in " (:description decision-test)))
+          (is (= (get-in decision-test [:right :context :expected])
+                @(get-in decision-test [:right :context :actual]))
+            (str "right context in " (:description decision-test)))))))
 
   (doseq [handler-name ts/handler-names
           handler-test handler-tests]
