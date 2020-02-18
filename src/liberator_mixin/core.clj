@@ -67,7 +67,8 @@
               (let [decision (f context)
                     comparison (if (nil? result)
                                  (if-vector? decision first)
-                                 (comparator result (if-vector? decision first)))
+                                 (comparator result
+                                   (if-vector? decision first)))
                     result (boolean comparison)
                     context-update (if-vector? decision second)
                     context (liberator/update-context context context-update)]
@@ -125,27 +126,35 @@
   (fn merged
     ([] (merged {}))
     ([context]
-     (let [left-conf ((liberator-util/make-function left) context)
-           right-conf ((liberator-util/make-function right) context)]
-       (cond
-         (-> right-conf meta :replace)
-         right-conf
+      (let [left-conf ((liberator-util/make-function left) context)
+            right-conf ((liberator-util/make-function right) context)]
+        (cond
+          (-> right-conf meta :replace)
+          right-conf
 
-         (and (list? left-conf) (coll? right-conf))
-         (apply list (concat right-conf left-conf))
+          (and (list? left-conf) (coll? right-conf))
+          (apply list (concat right-conf left-conf))
 
-         (and (vector? left-conf) (coll? right-conf))
-         (into right-conf left-conf)
+          (and (vector? left-conf) (coll? right-conf))
+          (into right-conf left-conf)
 
-         (and (set? left-conf) (coll? right-conf))
-         (into left-conf right-conf)
+          (and (set? left-conf) (coll? right-conf))
+          (into left-conf right-conf)
 
-         :otherwise right-conf)))))
+          :otherwise right-conf)))))
 
 (def or-decisions
-  #{:malformed? :can-post-to-gone? :conflict? :existed? :moved-permanently?
-    :moved-temporarily? :multiple-representations?
-    :post-redirect? :put-to-different-url? :respond-with-entity? :uri-too-long?})
+  #{:malformed?
+    :can-post-to-gone?
+    :conflict?
+    :existed?
+    :moved-permanently?
+    :moved-temporarily?
+    :multiple-representations?
+    :post-redirect?
+    :put-to-different-url?
+    :respond-with-entity?
+    :uri-too-long?})
 
 (defn or-comparator
   [left right]
@@ -183,7 +192,10 @@
           (let [current (get result k)]
             (assoc result
               k (cond
-                  (is-decision? k) (merge-decisions current override (get-comparator k))
+                  (is-decision? k) (merge-decisions
+                                     current
+                                     override
+                                     (get-comparator k))
                   (is-action? k) (merge-actions current override)
                   (is-handler? k) (merge-handlers current override)
                   (is-configuration? k) (merge-configurations current override)

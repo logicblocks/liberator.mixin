@@ -40,7 +40,8 @@
 
 (defn- parse-token [scopes secret data opts]
   (try
-    (let [claims (jwt/unsign data secret opts) authorisation (is-authorised? claims scopes)]
+    (let [claims (jwt/unsign data secret opts)
+          authorisation (is-authorised? claims scopes)]
       {:identity {:claims     claims
                   :authorised (:authorised authorisation)
                   :message    (:message authorisation)

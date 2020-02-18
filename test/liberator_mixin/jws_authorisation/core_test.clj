@@ -72,7 +72,8 @@
                      request)
           body (:body response)]
       (is (= 403 (:status response)))
-      (is (= "Scope claim does not contain required scopes (read)." (:message body)))))
+      (is (= "Scope claim does not contain required scopes (read)."
+            (:message body)))))
 
   (testing "the resource does not have scope claim"
     (let [resource (core/build-resource
