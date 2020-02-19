@@ -10,7 +10,8 @@
     [liberator-mixin.core :as core]
     [liberator-mixin.jws-authorisation.core :as jws]
     [liberator-mixin.json.core :as json]
-    [jason.convenience :refer [<-wire-json]]))
+    [jason.convenience :refer [<-wire-json]]
+    [clojure.string :as string]))
 
 (defn call-resource [resource request]
   (->
@@ -22,7 +23,7 @@
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -40,7 +41,7 @@
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation [] "foo")
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -58,7 +59,7 @@
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -70,16 +71,17 @@
           response (call-resource
                      resource
                      request)
-          body (:body response)]
+          header (get-in response [:headers "WWW-Authenticate"])]
       (is (= 403 (:status response)))
-      (is (= "Scope claim does not contain required scopes (read)."
-            (:message body)))))
+      (is (string/includes?
+            header
+            "Scope claim does not contain required scopes (read)."))))
 
   (testing "the resource does not have scope claim"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -91,15 +93,15 @@
           response (call-resource
                      resource
                      request)
-          body (:body response)]
+          header (get-in response [:headers "WWW-Authenticate"])]
       (is (= 401 (:status response)))
-      (is (= "Token does not contain scope claim." (:message body)))))
+      (is (string/includes? header "Token does not contain scope claim."))))
 
   (testing "the token is under the wrong identifier"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -111,15 +113,17 @@
           response (call-resource
                      resource
                      request)
-          body (:body response)]
+          header (get-in response [:headers "WWW-Authenticate"])]
       (is (= 400 (:status response)))
-      (is (= "Message does not contain a Bearer token." (:message body)))))
+      (is (string/includes?
+            header
+            "Message does not contain a Bearer token."))))
 
   (testing "the token has expired"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -143,7 +147,7 @@
                        ["read"]
                        "foo"
                        :opts {:aud "pms.com"})
-                     (jws/with-jws-unauthorised-as-json)
+                     (jws/with-jws-unauthorised)
                      {:handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
@@ -157,6 +161,6 @@
           response (call-resource
                      resource
                      request)
-          body (:body response)]
+          header (get-in response [:headers "WWW-Authenticate"])]
       (is (= 401 (:status response)))
-      (is (= "Audience does not match pms.com" (:message body))))))
+      (is (string/includes? header "Audience does not match pms.com")))))
