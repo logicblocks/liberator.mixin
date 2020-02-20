@@ -20,16 +20,16 @@
   ([message]
     (to-error message {}))
   ([message data]
-    {:authorised false
-     :message    message
-     :data       data}))
+    {:authorised? false
+     :error       {:message message
+                   :data    data}}))
 
 (defn- is-authorised? [claims required-scopes]
   (if (empty? required-scopes)
-    {:authorised true}
+    {:authorised? true}
     (if-let [scope (:scope claims)]
       (if-let [authorised (every? (parse-scopes scope) required-scopes)]
-        {:authorised authorised}
+        {:authorised? authorised}
         (to-error
           (format "Scope claim does not contain required scopes (%s)."
             (str/join "," required-scopes))
@@ -41,18 +41,17 @@
 (defn- parse-token [scopes secret data opts]
   (try
     (let [claims (jwt/unsign data secret opts)
-          authorisation (is-authorised? claims scopes)]
-      {:identity {:claims     claims
-                  :authorised (:authorised authorisation)
-                  :message    (:message authorisation)
-                  :data       (:data authorisation)}})
+          {:keys [authorised? error]} (is-authorised? claims scopes)]
+      {:identity claims
+       :authorised? authorised?
+       :error error})
     (catch ExceptionInfo e
-      {:identity (to-error (ex-message e) (ex-data e))})))
+      (to-error (ex-message e) (ex-data e)))))
 
 (defn- missing-token [token]
-  {:identity (to-error
-               (format "Message does not contain a %s token." token)
-               {:type :validation :cause :token})})
+  (to-error
+    (format "Message does not contain a %s token." token)
+    {:type :validation :cause :token}))
 
 (defn with-jws-authorisation
   "Returns a mixin that validates the jws token ensure it includes the scope
@@ -75,18 +74,18 @@
                            (if (some? data)
                              (parse-token scopes secret data opts)
                              (missing-token token))))
-   :authorized?        (fn [{:keys [identity]}]
-                         (:authorised identity))})
+   :authorized?        (fn [{:keys [authorised?]}] authorised?)})
 
-(defn- cause-to-status
-  [{:keys [type cause]}]
-  (cond
-    (and (= type :validation) (= cause :token)) 400
-    (and (= type :validation) (= cause :missing-scopes)) 403
-    (= type :validation) 401
-    :else 500))
+(defn- error-to-status
+  [{:keys [data]}]
+  (let [{:keys [type cause]} data]
+    (cond
+      (and (= type :validation) (= cause :token)) 400
+      (and (= type :validation) (= cause :missing-scopes)) 403
+      (= type :validation) 401
+      :else 500)))
 
-(defn- cause-to-type
+(defn- data-to-type
   [{:keys [type cause]}]
   (cond
     (and (= type :validation) (= cause :token)) "invalid_request"
@@ -94,23 +93,22 @@
     (= type :validation) "invalid_token"
     :else 500))
 
-(defn- cause-to-error [message cause]
+(defn- error-to-header [{:keys [message data]}]
   (str
     "Bearer,\n"
-    "error=\"" (cause-to-type cause) "\",\n"
+    "error=\"" (data-to-type data) "\",\n"
     "error_message=\"" message "\"\n"))
 
 (defn with-jws-unauthorised
+  "Returns a mixin populates the WWW-Authenticate error when the
+  JWT is not authorised to access the protected endpoint.
+
+  This mixin should only be used once."
   []
   {:authorized?
-   (fn [{:keys [identity]}]
-     (let [authorised? (:authorised identity)]
-       (if (true? authorised?)
-         true
-         false)))
+   (fn [{:keys [authorised?]}] authorised?)
    :handle-unauthorized
-   (fn [{:keys [identity]}]
-     (let [{:keys [message data]} identity]
-       (liberator.representation/ring-response
-         {:status  (cause-to-status data)
-          :headers {"WWW-Authenticate" (cause-to-error message data)}})))})
+   (fn [{:keys [error]}]
+     (liberator.representation/ring-response
+       {:status  (error-to-status error)
+        :headers {"WWW-Authenticate" (error-to-header error)}}))})
