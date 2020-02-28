@@ -133,5 +133,4 @@
   token."
   [required-scopes]
   (fn [scope]
-    (every? #(contains? (set required-scopes) %)
-      (string/split scope #" "))))
+    (every? (set (string/split scope #" ")) required-scopes)))

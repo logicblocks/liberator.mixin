@@ -55,7 +55,7 @@
           request (ring/header
                     request
                     "authorization"
-                    (str "Bearer " (sign {:scope "read"} "foo")))
+                    (str "Bearer " (sign {:scope "openid read"} "foo")))
           response (call-resource
                      resource
                      request)]
