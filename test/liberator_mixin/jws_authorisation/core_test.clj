@@ -37,6 +37,24 @@
                      request)]
       (is (= 200 (:status response)))))
 
+  (testing "the resource doesnt care about the case of bearer"
+    (let [resource (core/build-resource
+                     (json/with-json-media-type)
+                     (jws/with-jws-authorisation ["read"] "foo")
+                     (jws/with-jws-unauthorised)
+                     {:handle-ok
+                      (fn [{:keys [routes]}]
+                        routes)})
+          request (ring/request :get "/")
+          request (ring/header
+                    request
+                    "authorization"
+                    (str "bearer " (sign {:scope "read"} "foo")))
+          response (call-resource
+                     resource
+                     request)]
+      (is (= 200 (:status response)))))
+
   (testing "the resource is authorised when no scopes required"
     (let [resource (core/build-resource
                      (json/with-json-media-type)

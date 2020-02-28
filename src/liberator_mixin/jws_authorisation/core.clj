@@ -4,7 +4,8 @@
   (:require [clojure.string :as str]
     [buddy.auth.http :as http]
     [buddy.sign.jwt :as jwt]
-    [liberator-mixin.json.core :refer [with-json-media-type]])
+    [liberator-mixin.json.core :refer [with-json-media-type]]
+    [clojure.string :as string])
   (:import [clojure.lang ExceptionInfo]))
 
 (defn- parse-scopes [scope]
@@ -12,9 +13,15 @@
 
 (defn- parse-header
   [request token-name]
-  (some->> (http/-get-header request "authorization")
-    (re-find (re-pattern (str "^" token-name " (.+)$")))
-    (second)))
+  (let [header (http/-get-header request "authorization")
+        cases [(string/capitalize token-name)
+               (string/lower-case token-name)
+               (string/upper-case token-name)]
+        pattern (re-pattern
+                  (str "^(?:" (string/join "|" cases) ") (.+)$"))]
+    (some->> header
+      (re-find pattern)
+      (second))))
 
 (defn- to-error
   ([message]
