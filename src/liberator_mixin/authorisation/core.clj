@@ -88,7 +88,7 @@
            token-parser (get resource :token-parser identity)
            token (parse-header request (token-type) token-parser)]
        (if (some? token)
-         (parse-token (token-claims) (token-key) (token-options) token)
+         (parse-token (token-claims) token-key (token-options) token)
          (missing-token (token-type)))))
    :authorized?
    (fn [{:keys [authorised?]}] authorised?)})

@@ -21,6 +21,26 @@
     (update-in [:body] <-wire-json)))
 
 (deftest with-jws-authorisation
+  (testing "the resource is authorised with a function for the key"
+    (let [resource (core/build-resource
+                     (json/with-json-media-type)
+                     (auth/with-jws-access-token)
+                     (auth/with-www-authenticate)
+                     {:token-claims {:scope (auth/scope-validator #{"read"})}
+                      :token-key    (fn [_] "foo")
+                      :handle-ok
+                      (fn [{:keys [routes]}]
+                        routes)})
+          request (ring/request :get "/")
+          request (ring/header
+                    request
+                    "authorization"
+                    (str "Bearer " (sign {:scope "read"} "foo")))
+          response (call-resource
+                     resource
+                     request)]
+      (is (= 200 (:status response)))))
+
   (testing "the resource is authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
