@@ -1,4 +1,4 @@
-(ns liberator-mixin.jws-authorisation.core-test
+(ns liberator-mixin.authorisation.core-test
   (:require
     [clojure.test :refer :all]
 
@@ -8,7 +8,7 @@
     [ring.mock.request :as ring]
     [buddy.sign.jwt :refer [sign]]
     [liberator-mixin.core :as core]
-    [liberator-mixin.jws-authorisation.core :as jws]
+    [liberator-mixin.authorisation.core :as jws]
     [liberator-mixin.json.core :as json]
     [jason.convenience :refer [<-wire-json]]
     [clojure.string :as string]))
@@ -22,11 +22,14 @@
   (testing "the resource is authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-claims {:scope (fn [scope]
+                                              (every? #(contains? #{"read"} %) (string/split scope #" ")))}
+                      :token-key    "foo"
+                      :handle-ok
+                                    (fn [{:keys [routes]}]
+                                      routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -40,9 +43,12 @@
   (testing "the resource doesnt care about the case of bearer"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-claims {:scope (fn [scope]
+                                              (every? #(contains? #{"read"} %) (string/split scope #" ")))}
+                      :token-key    "foo"
+                      :handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
           request (ring/request :get "/")
@@ -58,11 +64,12 @@
   (testing "the resource is authorised when no scopes required"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation [] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-key "foo"
+                      :handle-ok
+                                 (fn [{:keys [routes]}]
+                                   routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -76,11 +83,15 @@
   (testing "the resource is not authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-claims {:scope (fn [scope]
+                                              (every? #(contains? #{"read"} %)
+                                                      (string/split scope #" ")))}
+                      :token-key    "foo"
+                      :handle-ok
+                                    (fn [{:keys [routes]}]
+                                      routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -93,14 +104,18 @@
       (is (= 403 (:status response)))
       (is (string/includes?
             header
-            "Scope claim does not contain required scopes (read)."))))
+            "Access token failed validation for scope."))))
 
   (testing "the resource does not have scope claim"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-claims {:scope (fn [scope]
+                                              (every? #(contains? #{"read"} %)
+                                                      (string/split scope #" ")))}
+                      :token-key "foo"
+                      :handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
           request (ring/request :get "/")
@@ -112,15 +127,16 @@
                      resource
                      request)
           header (get-in response [:headers "WWW-Authenticate"])]
-      (is (= 401 (:status response)))
-      (is (string/includes? header "Token does not contain scope claim."))))
+      (is (= 403 (:status response)))
+      (is (string/includes? header "Access token failed validation for scope."))))
 
   (testing "the token is under the wrong identifier"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-key "foo"
+                      :handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
           request (ring/request :get "/")
@@ -140,9 +156,10 @@
   (testing "the token has expired"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation ["read"] "foo")
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-key "foo"
+                      :handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
           request (ring/request :get "/")
@@ -152,7 +169,7 @@
                     "authorization"
                     (str "Bearer " (sign {:scope "read"
                                           :exp   expiry-time}
-                                     "foo")))
+                                         "foo")))
           response (call-resource
                      resource
                      request)]
@@ -161,12 +178,11 @@
   (testing "does not meet the required audience"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (jws/with-jws-authorisation
-                       ["read"]
-                       "foo"
-                       :opts {:aud "pms.com"})
-                     (jws/with-jws-unauthorised)
-                     {:handle-ok
+                     (jws/with-jws-access-token)
+                     (jws/with-www-authenticate)
+                     {:token-key "foo"
+                      :token-options {:aud "pms.com"}
+                      :handle-ok
                       (fn [{:keys [routes]}]
                         routes)})
           request (ring/request :get "/")
@@ -175,7 +191,7 @@
                     "authorization"
                     (str "Bearer " (sign {:scope "read"
                                           :aud   "developers.com"}
-                                     "foo")))
+                                         "foo")))
           response (call-resource
                      resource
                      request)
