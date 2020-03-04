@@ -24,8 +24,7 @@
   (testing "the resource is authorised with a function for the key"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (auth/scope-validator #{"read"})}
                       :token-key    (fn [_] "foo")
                       :handle-ok
@@ -44,8 +43,7 @@
   (testing "the resource is authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (auth/scope-validator #{"read"})}
                       :token-key    "foo"
                       :handle-ok
@@ -64,8 +62,7 @@
   (testing "the resource is not authorised with multiple claims"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (auth/scope-validator #{"read"})
                                      :failed (constantly false)}
                       :token-key    "foo"
@@ -89,8 +86,7 @@
   (testing "the resource is not authorised with multiple claims contains last"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (auth/scope-validator #{"read"})
                                      :failed (constantly false)}
                       :token-key    "foo"
@@ -114,8 +110,7 @@
   (testing "the resource doesnt care about the case of bearer"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope
                                      (fn [scope]
                                        (every?
@@ -138,8 +133,7 @@
   (testing "the resource is authorised with a different token scheme"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (fn [scope]
                                               (every?
                                                 #(contains? #{"read"} %)
@@ -162,8 +156,7 @@
   (testing "the resource is authorised when encoded"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (fn [scope]
                                               (every?
                                                 #(contains? #{"read"} %)
@@ -190,8 +183,7 @@
   (testing "the resource is authorised when no scopes required"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
                       (fn [{:keys [routes]}]
@@ -209,8 +201,7 @@
   (testing "the resource is not authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (fn [scope]
                                               (every? #(contains? #{"read"} %)
                                                 (string/split scope #" ")))}
@@ -235,8 +226,7 @@
   (testing "the resource does not have scope claim"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-claims {:scope (fn [scope]
                                               (every? #(contains? #{"read"} %)
                                                 (string/split scope #" ")))}
@@ -260,8 +250,7 @@
   (testing "the token is under the wrong identifier"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
                       (fn [{:keys [routes]}]
@@ -278,13 +267,12 @@
       (is (= 400 (:status response)))
       (is (string/includes?
             header
-            "Message does not contain a Bearer token."))))
+            "Authorisation header does not contain a token."))))
 
   (testing "the token is not signed with the same key"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
                       (fn [{:keys [routes]}]
@@ -306,8 +294,7 @@
   (testing "the token has expired"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
                       (fn [{:keys [routes]}]
@@ -328,8 +315,7 @@
   (testing "does not meet the required audience"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
-                     (auth/with-jws-access-token)
-                     (auth/with-www-authenticate)
+                     (auth/with-jws-access-token-mixin)
                      {:token-key     "foo"
                       :token-options {:aud "pms.com"}
                       :handle-ok

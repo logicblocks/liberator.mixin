@@ -1,9 +1,9 @@
 (ns liberator-mixin.authorisation.core
   "Liberator mixin to authorise a request based on an access token"
   (:require [buddy.auth.http :as http]
-    [buddy.sign.jwt :as jwt]
-    [liberator-mixin.json.core :refer [with-json-media-type]]
-    [clojure.string :as string])
+            [buddy.sign.jwt :as jwt]
+            [liberator-mixin.json.core :refer [with-json-media-type]]
+            [clojure.string :as string])
   (:import [clojure.lang ExceptionInfo]))
 
 (defn- parse-header
@@ -21,11 +21,11 @@
 
 (defn- to-error
   ([message]
-    (to-error message {}))
+   (to-error message {}))
   ([message data]
-    {:authorised? false
-     :error       {:message message
-                   :data    data}}))
+   {:authorised? false
+    :error       {:message message
+                  :data    data}}))
 
 (defn- is-authorised? [token-claims claims]
   (if (empty? token-claims)
@@ -57,23 +57,15 @@
     (catch ExceptionInfo e
       (to-error (ex-message e) (ex-data e)))))
 
-(defn- missing-token [token]
+(defn- missing-token []
   (to-error
-    (format "Message does not contain a %s token." token)
+    "Authorisation header does not contain a token."
     {:type :validation :cause :token}))
 
-(defn with-jws-access-token
-  "Returns a mixin that validates the jws access token ensure it includes the
-  claims and that claim passes validation, finally it stores the authentication
-  and authorisation state on the context under :identity
+(defn with-access-token
+  "Returns a mixin that extracts the access token from the authorisation header
 
   :token-type - the scheme under the authorisation header (default is Bearer)
-  :token-key - the secret can be a function which is provided the JOSE header
-  as its single param
-  :token-options - that is used to validate the standard claims of the
-  token (aud, iss, sub, exp, nbf, iat) (optional)
-  :token-claims - a map of expected claims and how to validate them as function
-  that takes the claim value (optional)
   :token-parser - a function that performs parsing of the token before
   validation (optional)
 
@@ -82,16 +74,38 @@
   {:initialize-context
    (fn [{:keys [request resource]}]
      (let [token-type (get resource :token-type (constantly "Bearer"))
-           token-options (get resource :token-options (constantly {}))
-           token-key (get resource :token-key)
-           token-claims (get resource :token-claims (constantly {}))
            token-parser (get resource :token-parser identity)
            token (parse-header request (token-type) token-parser)]
-       (if (some? token)
-         (parse-token (token-claims) token-key (token-options) token)
-         (missing-token (token-type)))))
-   :authorized?
-   (fn [{:keys [authorised?]}] authorised?)})
+       {:token token}))})
+
+(defn with-jws-access-token
+  "Returns a mixin that validates the jws access token ensure it includes the
+  claims and that claim passes validation, finally it stores the authentication
+  and authorisation state on the context under :identity
+
+  This mixin assumes a token already on the context under :token
+
+  :token-key - the secret can be a function which is provided the JOSE header
+  as its single param
+  :token-options - that is used to validate the standard claims of the
+  token (aud, iss, sub, exp, nbf, iat) (optional)
+  :token-claims - a map of expected claims and how to validate them as function
+  that takes the claim value (optional)
+
+  This mixin should only be used once."
+  []
+  {:authorized?
+   (fn [{:keys [token resource]}]
+     (if (some? token)
+       (let [token-options (get resource :token-options (constantly {}))
+             token-key (get resource :token-key)
+             token-claims (get resource :token-claims (constantly {}))
+             {:keys [authorised?] :as result}
+             (parse-token (token-claims) token-key (token-options) token)]
+         (if (true? authorised?)
+           [true (dissoc result :error)]
+           [false result]))
+       [false (missing-token)]))})
 
 (defn- error-to-status
   [{:keys [data]}]
@@ -127,6 +141,12 @@
      (liberator.representation/ring-response
        {:status  (error-to-status error)
         :headers {"WWW-Authenticate" (error-to-header error)}}))})
+
+(defn with-jws-access-token-mixin
+  []
+  [(with-access-token)
+   (with-jws-access-token)
+   (with-www-authenticate)])
 
 (defn scope-validator
   "Returns a validator that ensures all required scopes are included in the
