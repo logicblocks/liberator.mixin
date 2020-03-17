@@ -120,9 +120,9 @@
   [{:keys [type cause]}]
   (cond
     (and (= type :validation) (= cause :token)) "invalid_request"
-    (and (= type :validation) (= cause :missing-scopes)) "insufficient_scope"
+    (and (= type :validation) (= cause :scope)) "insufficient_scope"
     (= type :validation) "invalid_token"
-    :else 500))
+    :else "internal_server_error"))
 
 (defn- error-to-header [{:keys [message data]}]
   (str
