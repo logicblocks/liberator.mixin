@@ -7,7 +7,7 @@ An extension to liberator allowing for composable mixins.
 Add the following to your `project.clj` file:
 
 ```clj
-[b-social/liberator-mixin "0.0.48"]
+[b-social/liberator-mixin "0.0.49"]
 ```
 
 ## Documentation
