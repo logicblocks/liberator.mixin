@@ -137,8 +137,9 @@
   This mixin should only be used once."
   []
   {:handle-unauthorized
-   (fn [{:keys [error]}]
+   (fn [{:keys [error error-body]}]
      (liberator.representation/ring-response
+       error-body
        {:status  (error-to-status error)
         :headers {"WWW-Authenticate" (error-to-header error)}}))})
 
