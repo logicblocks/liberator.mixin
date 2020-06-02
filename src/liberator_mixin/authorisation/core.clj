@@ -132,7 +132,7 @@
 
 (defn with-www-authenticate
   "Returns a mixin that populates the WWW-Authenticate error when the
-  JWT is not authorised to access the protected endpoint.
+  request is not authorised to access the protected endpoint.
 
   This mixin should only be used once."
   []
