@@ -2,9 +2,17 @@
   "Liberator mixin to authorise a request based on an access token"
   (:require [buddy.auth.http :as http]
             [buddy.sign.jwt :as jwt]
-            [liberator-mixin.json.core :refer [with-json-media-type]]
-            [clojure.string :as string])
-  (:import [clojure.lang ExceptionInfo]))
+            [clojure.string :as string]))
+
+(defprotocol ClaimValidator
+  (validate
+    [this ctx value]
+    "Validate a claim.
+
+    * ctx - liberator context
+    * value -  claim value
+
+    If not valid an exception can be thrown for a more specific error"))
 
 (defn- parse-header
   [request token-name token-parser]
@@ -15,58 +23,36 @@
         pattern (re-pattern
                   (str "^(?:" (string/join "|" cases) ") (.+)$"))]
     (some->> header
-      (re-find pattern)
-      (second)
-      (token-parser))))
+             (re-find pattern)
+             (second)
+             (token-parser))))
 
-(defn- to-error
-  ([message]
-   (to-error message {}))
-  ([message data]
-   {:authorised? false
-    :error       {:message message
-                  :data    data}}))
+(defn- is-authorised? [ctx validators claims]
+  (do
+    (doseq [^ClaimValidator validator validators]
+      (when-not (true? (validate validator ctx claims))
+        (throw (ex-info (format "Access token failed validation.")
+                        {:type :validation :cause :claims}))))
+    true))
 
-(defn- is-authorised? [token-claims claims]
-  (if (empty? token-claims)
-    {:authorised? true}
-    (let [results
-          (for [token-claim token-claims
-                :let [key (first token-claim)
-                      validator (second token-claim)
-                      found (key claims)]]
-            {:authorised?
-             (and (some? found) (true? (validator found)))
-             :error
-             {:message (format "Access token failed validation for %s."
-                         (name key))
-              :data    {:type :validation :cause key}}})]
-      (reduce (fn [state curr]
-                (let [authorised? (:authorised? curr)]
-                  {:authorised? (and (:authorised? state) authorised?)
-                   :error       (if authorised? (:error state) (:error curr))}))
-        results))))
-
-(defn- parse-token [token-claims token-key token-opts data]
+(defn- parse-token [ctx validators key options token]
   (try
-    (let [claims (jwt/unsign data token-key token-opts)
-          {:keys [authorised? error]} (is-authorised? token-claims claims)]
+    (let [claims (jwt/unsign token key options)]
       {:identity    claims
-       :authorised? authorised?
-       :error       error})
-    (catch ExceptionInfo e
-      (to-error (ex-message e) (ex-data e)))))
+       :authorised? (is-authorised? ctx validators claims)})
+    (catch Exception e
+      {:authorised? false :exception e})))
 
-(defn- missing-token []
-  (to-error
-    "Authorisation header does not contain a token."
-    {:type :validation :cause :token}))
+(def missing-token
+  {:exception (ex-info
+                "Authorisation header does not contain a token."
+                {:type :validation :cause :token})})
 
 (defn with-access-token
   "Returns a mixin that extracts the access token from the authorisation header
 
-  :token-type - the scheme under the authorisation header (default is Bearer)
-  :token-parser - a function that performs parsing of the token before
+  * token-type - the scheme under the authorisation header (default is Bearer)
+  * token-parser - a function that performs parsing of the token before
   validation (optional)
 
   This mixin should only be used once."
@@ -85,36 +71,32 @@
 
   This mixin assumes a token already on the context under :token
 
-  :token-key - the secret can be a function which is provided the JOSE header
+  * token-key - the secret can be a function which is provided the JOSE header
   as its single param
-  :token-options - that is used to validate the standard claims of the
+  * token-options - that is used to validate the standard claims of the
   token (aud, iss, sub, exp, nbf, iat) (optional)
-  :token-claims - a map of expected claims and how to validate them as function
-  that takes the claim value (optional)
+  * token-validators - a array of ClaimValidators (optional)
 
   This mixin should only be used once."
   []
   {:authorized?
-   (fn [{:keys [token resource]}]
+   (fn [{:keys [token resource] :as ctx}]
      (if (some? token)
-       (let [token-options (get resource :token-options (constantly {}))
-             token-key (get resource :token-key)
-             token-claims (get resource :token-claims (constantly {}))
+       (let [{:keys [token-options token-key token-validators]
+              :or   {token-options    (constantly {})
+                     token-validators (constantly [])}} resource
              {:keys [authorised?] :as result}
-             (parse-token (token-claims) token-key (token-options) token)]
-         (if (true? authorised?)
-           [true (dissoc result :error)]
-           [false result]))
-       [false (missing-token)]))})
+             (parse-token ctx (token-validators) token-key (token-options) token)]
+         [authorised? result])
+       [false missing-token]))})
 
-(defn- error-to-status
-  [{:keys [data]}]
-  (let [{:keys [type cause]} data]
-    (cond
-      (and (= type :validation) (= cause :token)) 400
-      (and (= type :validation) (= cause :scope)) 403
-      (= type :validation) 401
-      :else 500)))
+(defn- data-to-status
+  [{:keys [type cause]}]
+  (cond
+    (and (= type :validation) (= cause :token)) 400
+    (and (= type :validation) (= cause :claims)) 403
+    (= type :validation) 401
+    :else 500))
 
 (defn- data-to-type
   [{:keys [type cause]}]
@@ -124,7 +106,7 @@
     (= type :validation) "invalid_token"
     :else "internal_server_error"))
 
-(defn- error-to-header [{:keys [message data]}]
+(defn- error-to-header [data message]
   (str
     "Bearer,\n"
     "error=\"" (data-to-type data) "\",\n"
@@ -137,11 +119,13 @@
   This mixin should only be used once."
   []
   {:handle-unauthorized
-   (fn [{:keys [error error-body]}]
-     (liberator.representation/ring-response
-       error-body
-       {:status  (error-to-status error)
-        :headers {"WWW-Authenticate" (error-to-header error)}}))})
+   (fn [{:keys [^Exception exception error-body]}]
+     (let [message (ex-message exception)
+           data (ex-data exception)]
+       (liberator.representation/ring-response
+         error-body
+         {:status  (data-to-status data)
+          :headers {"WWW-Authenticate" (error-to-header data message)}})))})
 
 (defn with-jws-access-token-mixin
   []
@@ -149,9 +133,17 @@
    (with-jws-access-token)
    (with-www-authenticate)])
 
-(defn scope-validator
-  "Returns a validator that ensures all required scopes are included in the
-  token."
+(deftype ScopeValidator
   [required-scopes]
-  (fn [scope]
-    (every? (set (string/split scope #" ")) required-scopes)))
+  ClaimValidator
+  (validate [_ _ claims]
+    (let [scope (:scope claims)]
+      (if
+        (and
+          (some? scope)
+          (every? (set (string/split scope #" ")) required-scopes))
+        true
+        (throw (ex-info (format "Access token failed validation for scope.")
+                        {:type :validation :cause :claims}))))))
+
+(defn ->ScopeValidator [required-scopes] (ScopeValidator. required-scopes))
