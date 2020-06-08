@@ -9,10 +9,13 @@
     [this ctx value]
     "Validate a claim.
 
+    Params:
     * ctx - liberator context
     * value -  claim value
-
-    If not valid an exception can be thrown for a more specific error"))
+    
+    Returns an array of:
+    * valid?
+    * error message"))
 
 (defn- parse-header
   [request token-name token-parser]
@@ -23,23 +26,25 @@
         pattern (re-pattern
                   (str "^(?:" (string/join "|" cases) ") (.+)$"))]
     (some->> header
-             (re-find pattern)
-             (second)
-             (token-parser))))
+      (re-find pattern)
+      (second)
+      (token-parser))))
 
-(defn- is-authorised? [ctx validators claims]
+(defn- is-valid? [ctx validators claims]
   (do
-    (doseq [^ClaimValidator validator validators]
-      (when-not (true? (validate validator ctx claims))
-        (throw (ex-info (format "Access token failed validation.")
-                        {:type :validation :cause :claims}))))
+    (doseq [^ClaimValidator validator validators
+            :let [[valid? error] (validate validator ctx claims)
+                  {:keys [message cause]
+                   :or   {message "Access token failed validation."
+                          cause   {:type :validation :cause :claims}}} error]]
+      (when-not (true? valid?) (throw (ex-info message cause))))
     true))
 
 (defn- parse-token [ctx validators key options token]
   (try
     (let [claims (jwt/unsign token key options)]
       {:identity    claims
-       :authorised? (is-authorised? ctx validators claims)})
+       :authorised? (is-valid? ctx validators claims)})
     (catch Exception e
       {:authorised? false :exception e})))
 
@@ -142,8 +147,8 @@
         (and
           (some? scope)
           (every? (set (string/split scope #" ")) required-scopes))
-        true
-        (throw (ex-info (format "Access token failed validation for scope.")
-                        {:type :validation :cause :claims}))))))
+        [true]
+        [false {:message "Access token failed validation for scope."
+                :cause   {:type :validation :cause :claims}}]))))
 
 (defn ->ScopeValidator [required-scopes] (ScopeValidator. required-scopes))

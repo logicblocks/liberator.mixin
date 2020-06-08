@@ -23,7 +23,7 @@
 (deftype FailedValidator
   []
   auth/ClaimValidator
-  (validate [_ _ _] false))
+  (validate [_ _ _] [false]))
 
 (deftest with-jws-authorisation
   (testing "the resource is authorised with a function for the key"
