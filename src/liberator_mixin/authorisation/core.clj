@@ -2,7 +2,8 @@
   "Liberator mixin to authorise a request based on an access token"
   (:require [buddy.auth.http :as http]
             [buddy.sign.jwt :as jwt]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [liberator.representation :as representation]))
 
 (defprotocol ClaimValidator
   (validate
@@ -127,7 +128,7 @@
    (fn [{:keys [^Exception exception error-body]}]
      (let [message (ex-message exception)
            data (ex-data exception)]
-       (liberator.representation/ring-response
+       (representation/ring-response
          error-body
          {:status  (data-to-status data)
           :headers {"WWW-Authenticate" (error-to-header data message)}})))})
