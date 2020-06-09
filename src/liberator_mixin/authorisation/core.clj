@@ -7,16 +7,16 @@
 
 (defprotocol ClaimValidator
   (validate
-    [this ctx value]
-    "Validate a claim.
+    [this ctx claims]
+    "Validate a tokens claims.
 
     Params:
     * ctx - liberator context
-    * value -  claim value
+    * claims - token claims
     
     Returns an array of:
     * valid?
-    * error message"))
+    * error map containing message and cause metadata"))
 
 (defn- parse-header
   [request token-name token-parser]
