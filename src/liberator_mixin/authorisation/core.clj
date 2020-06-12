@@ -3,7 +3,7 @@
   (:require [buddy.auth.http :as http]
             [buddy.sign.jwt :as jwt]
             [clojure.string :as string]
-            [liberator.representation :as representation]))
+            [liberator.representation :as r]))
 
 (defprotocol ClaimValidator
   (validate
@@ -128,7 +128,7 @@
    (fn [{:keys [^Exception exception error-body]}]
      (let [message (ex-message exception)
            data (ex-data exception)]
-       (representation/ring-response
+       (r/ring-response
          error-body
          {:status  (data-to-status data)
           :headers {"WWW-Authenticate" (error-to-header data message)}})))})
