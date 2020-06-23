@@ -201,3 +201,20 @@
               (:message log-state)))
         (is (some? (:context log-state)))
         (is (some? (:cause log-state)))))))
+
+(deftest with-forbidden-handler
+  (let [resource (core/build-resource
+                   (hypermedia/with-hypermedia-mixin)
+                   (json/with-json-mixin)
+                   (hal/with-hal-media-type)
+                   (hal/with-forbidden-handler)
+                   {:allowed? (constantly false)})
+        response (call-resource
+                   resource
+                   (ring/header
+                     (ring/request :get "/")
+                     :accept hal/hal-media-type))]
+    (testing "returns a json response when an exception is thrown"
+      (is (= 403 (:status response)))
+      (is (= "Forbidden"
+            (get-in response [:body :error]))))))

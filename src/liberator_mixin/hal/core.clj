@@ -129,6 +129,14 @@
        (hal/new-resource)
        {:error not-found-message}))})
 
+(defn with-forbidden-handler []
+  {:handle-forbidden
+   (fn [{:keys [forbidden-message]
+         :or   {forbidden-message "Forbidden"}}]
+     (hal/add-properties
+       (hal/new-resource)
+       {:error forbidden-message}))})
+
 (defn with-hal-mixin [_]
   [(with-hal-media-type)
    (with-hal-error-representation)
