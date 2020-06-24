@@ -41,14 +41,14 @@
   routes to the `context` so nothing further is needed if that mixin is in use."
   (:require
     [halboy.resource :as hal]
+    [liberator.representation :as r]
+
     [halboy.json :as haljson]
 
     [hype.core :as hype]
 
-    [jason.convenience :as jason-conv]
-
-    [liberator.representation :as r]
-    [liberator-mixin.logging.core :as log])
+    [liberator-mixin.logging.core :as log]
+    [jason.convenience :as jason-conv])
   (:import
     [halboy.resource Resource]
     [java.util UUID]))

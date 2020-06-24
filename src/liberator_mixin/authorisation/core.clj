@@ -27,21 +27,22 @@
         pattern (re-pattern
                   (str "^(?:" (string/join "|" cases) ") (.+)$"))]
     (some->> header
-      (re-find pattern)
-      (second)
-      (token-parser))))
+             (re-find pattern)
+             (second)
+             (token-parser))))
 
-(defn- is-valid? [ctx validators claims]
-  (do
-    (doseq [^ClaimValidator validator validators
-            :let [[valid? error] (validate validator ctx claims)
-                  {:keys [message cause]
-                   :or   {message "Access token failed validation."
-                          cause   {:type :validation :cause :claims}}} error]]
-      (when-not (true? valid?) (throw (ex-info message cause))))
-    true))
+(defn- is-valid?
+  [ctx validators claims]
+  (doseq [^ClaimValidator validator validators
+          :let [[valid? error] (validate validator ctx claims)
+                {:keys [message cause]
+                 :or   {message "Access token failed validation."
+                        cause   {:type :validation :cause :claims}}} error]]
+    (when-not (true? valid?) (throw (ex-info message cause))))
+  true)
 
-(defn- parse-token [ctx validators key options token]
+(defn- parse-token
+  [ctx validators key options token]
   (try
     (let [claims (jwt/unsign token key options)]
       {:identity    claims
@@ -54,7 +55,7 @@
                 "Authorisation header does not contain a token."
                 {:type :validation :cause :token})})
 
-(defn with-access-token
+(defn with-bearer-token
   "Returns a mixin that extracts the access token from the authorisation header
 
   * token-type - the scheme under the authorisation header (default is Bearer)
@@ -70,7 +71,7 @@
            token (parse-header request (token-type) token-parser)]
        {:token token}))})
 
-(defn with-jws-access-token
+(defn with-token-authorization
   "Returns a mixin that validates the jws access token ensure it includes the
   claims and that claim passes validation, finally it stores the authentication
   and authorisation state on the context under :identity
@@ -82,19 +83,20 @@
   * token-options - that is used to validate the standard claims of the
   token (aud, iss, sub, exp, nbf, iat) (optional)
   * token-validators - a array of ClaimValidators (optional)
+  * token-missing - what action should be performed if there is no token (defaults to not authorized)
 
   This mixin should only be used once."
   []
   {:authorized?
    (fn [{:keys [token resource] :as ctx}]
-     (if (some? token)
-       (let [{:keys [token-options token-key token-validators]
-              :or   {token-options    (constantly {})
-                     token-validators (constantly [])}} resource
-             {:keys [authorised?] :as result}
-             (parse-token ctx (token-validators) token-key (token-options) token)]
-         [authorised? result])
-       [false missing-token]))})
+     (let [{:keys [token-options token-key token-validators token-missing]
+            :or   {token-options    (constantly {})
+                   token-validators (constantly [])
+                   token-missing    (constantly [false missing-token])}} resource]
+       (if (some? token)
+         (let [{:keys [authorised?] :as result} (parse-token ctx (token-validators) token-key (token-options) token)]
+           [authorised? result])
+         (token-missing))))})
 
 (defn- data-to-status
   [{:keys [type cause]}]
@@ -108,17 +110,18 @@
   [{:keys [type cause]}]
   (cond
     (and (= type :validation) (= cause :token)) "invalid_request"
-    (and (= type :validation) (= cause :scope)) "insufficient_scope"
+    (and (= type :validation) (= cause :claims)) "insufficient_scope"
     (= type :validation) "invalid_token"
     :else "internal_server_error"))
 
-(defn- error-to-header [data message]
+(defn- error-to-header
+  [data message]
   (str
     "Bearer,\n"
     "error=\"" (data-to-type data) "\",\n"
     "error_message=\"" message "\"\n"))
 
-(defn with-www-authenticate
+(defn with-handle-unauthorized-token
   "Returns a mixin that populates the WWW-Authenticate error when the
   request is not authorised to access the protected endpoint.
 
@@ -135,9 +138,9 @@
 
 (defn with-jws-access-token-mixin
   []
-  [(with-access-token)
-   (with-jws-access-token)
-   (with-www-authenticate)])
+  [(with-bearer-token)
+   (with-token-authorization)
+   (with-handle-unauthorized-token)])
 
 (deftype ScopeValidator
   [required-scopes]
@@ -151,5 +154,3 @@
         [true]
         [false {:message "Access token failed validation for scope."
                 :cause   {:type :validation :cause :claims}}]))))
-
-(defn ->ScopeValidator [required-scopes] (ScopeValidator. required-scopes))

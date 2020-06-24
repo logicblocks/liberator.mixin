@@ -6,8 +6,8 @@
             :url  "https://opensource.org/licenses/MIT"}
 
   :dependencies [[liberator "0.15.3"]
-                 [halboy "5.1.0"]
-                 [b-social/jason "0.1.4"]
+                 [halboy "5.1.1"]
+                 [b-social/jason "0.1.5"]
                  [b-social/hype "1.0.0"]
                  [buddy/buddy-auth "2.2.0"]]
 
@@ -24,9 +24,9 @@
   :profiles {:shared {:dependencies
                       [[org.clojure/clojure "1.10.1"]
                        [camel-snake-kebab "0.4.1"]
-                       [ring/ring-core "1.7.1"]
+                       [ring/ring-core "1.8.1"]
                        [ring/ring-mock "0.4.0"]
-                       [eftest "0.5.8"]]}
+                       [eftest "0.5.9"]]}
              :dev    [:shared {:source-paths ["dev"]
                                :eftest       {:multithread? false}}]
              :test   [:shared {:eftest {:multithread? false}}]}
