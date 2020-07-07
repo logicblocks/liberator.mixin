@@ -10,15 +10,12 @@
     [liberator-mixin.core :as core]
     [liberator-mixin.authorisation.core :as auth]
     [liberator-mixin.json.core :as json]
-    [jason.convenience :refer [<-wire-json]]
     [clojure.string :as string]
     [buddy.core.codecs.base64 :as b64]
     [buddy.core.codecs :as codecs]))
 
 (defn call-resource [resource request]
-  (->
-    (resource request)
-    (update-in [:body] <-wire-json)))
+  (resource request))
 
 (deftype FailedValidator
   []
@@ -257,6 +254,20 @@
       (is (string/includes?
             header
             "Authorisation header does not contain a token."))))
+
+  (testing "the token is not required"
+    (let [resource (core/build-resource
+                     (json/with-json-media-type)
+                     (auth/with-jws-access-token-mixin)
+                     {:token-required? false
+                      :handle-ok
+                                 (fn [{:keys [routes]}]
+                                   routes)})
+          request (ring/request :get "/")
+          response (call-resource
+                     resource
+                     request)]
+      (is (= 200 (:status response)))))
 
   (testing "the token is not signed with the same key"
     (let [resource (core/build-resource

@@ -27,9 +27,9 @@
         pattern (re-pattern
                   (str "^(?:" (string/join "|" cases) ") (.+)$"))]
     (some->> header
-             (re-find pattern)
-             (second)
-             (token-parser))))
+      (re-find pattern)
+      (second)
+      (token-parser))))
 
 (defn- is-valid?
   [ctx validators claims]
@@ -41,19 +41,19 @@
     (when-not (true? valid?) (throw (ex-info message cause))))
   true)
 
-(defn- parse-token
-  [ctx validators key options token]
+(defn- token->identity
+  [key options token]
   (try
     (let [claims (jwt/unsign token key options)]
-      {:identity    claims
-       :authorised? (is-valid? ctx validators claims)})
+      [true {:identity claims}])
     (catch Exception e
-      {:authorised? false :exception e})))
+      [false {:www-authenticate {:message   (ex-message e)
+                                 :error     "invalid_token"
+                                 :exception e}}])))
 
 (def missing-token
-  {:exception (ex-info
-                "Authorisation header does not contain a token."
-                {:type :validation :cause :token})})
+  {:www-authenticate {:message "Authorisation header does not contain a token."
+                      :error   "invalid_request"}})
 
 (defn with-bearer-token
   "Returns a mixin that extracts the access token from the authorisation header
@@ -83,64 +83,65 @@
   * token-options - that is used to validate the standard claims of the
   token (aud, iss, sub, exp, nbf, iat) (optional)
   * token-validators - a array of ClaimValidators (optional)
-  * token-missing - what action should be performed if there is no token (defaults to not authorized)
+  * token-required? - whether a token should be treated as mandatory (defaults to true)
+
 
   This mixin should only be used once."
   []
-  {:authorized?
-   (fn [{:keys [token resource] :as ctx}]
-     (let [{:keys [token-options token-key token-validators token-missing]
-            :or   {token-options    (constantly {})
-                   token-validators (constantly [])
-                   token-missing    (constantly [false missing-token])}} resource]
+  {:malformed?
+   (fn [{:keys [token resource]}]
+     (let [{:keys [token-required?]
+            :or   {token-required? (constantly true)}} resource]
+       (when
+         (and (nil? token) (true? (token-required?)))
+         missing-token)))
+   :authorized?
+   (fn [{:keys [token resource]}]
+     (let [{:keys [token-options token-key]
+            :or   {token-options (constantly {})}} resource]
        (if (some? token)
-         (let [{:keys [authorised?] :as result} (parse-token ctx (token-validators) token-key (token-options) token)]
-           [authorised? result])
-         (token-missing))))})
+         (token->identity token-key (token-options) token)
+         true)))
+   :allowed?
+   (fn [{:keys [identity resource] :as ctx}]
+     (if (some? identity)
+       (let [{:keys [token-validators]
+              :or   {token-validators (constantly [])}} resource]
+         (try
+           (is-valid? ctx (token-validators) identity)
+           (catch Exception e
+             [false {:www-authenticate
+                     {:message   (ex-message e)
+                      :error     "insufficient_scope"
+                      :exception e}}])))
+       true))})
 
-(defn- data-to-status
-  [{:keys [type cause]}]
-  (cond
-    (and (= type :validation) (= cause :token)) 400
-    (and (= type :validation) (= cause :claims)) 403
-    (= type :validation) 401
-    :else 500))
-
-(defn- data-to-type
-  [{:keys [type cause]}]
-  (cond
-    (and (= type :validation) (= cause :token)) "invalid_request"
-    (and (= type :validation) (= cause :claims)) "insufficient_scope"
-    (= type :validation) "invalid_token"
-    :else "internal_server_error"))
-
-(defn- error-to-header
-  [data message]
+(defn- error->header
+  [{:keys [error message]}]
   (str
     "Bearer,\n"
-    "error=\"" (data-to-type data) "\",\n"
+    "error=\"" error "\",\n"
     "error_message=\"" message "\"\n"))
 
-(defn with-handle-unauthorized-token
-  "Returns a mixin that populates the WWW-Authenticate error when the
-  request is not authorised to access the protected endpoint.
+
+(defn with-www-authenticate-header
+  "Returns a mixin that populates the WWW-Authenticate header when the
+  request is not allowed to access the protected endpoint.
 
   This mixin should only be used once."
   []
-  {:handle-unauthorized
-   (fn [{:keys [^Exception exception error-body]}]
-     (let [message (ex-message exception)
-           data (ex-data exception)]
-       (r/ring-response
-         error-body
-         {:status  (data-to-status data)
-          :headers {"WWW-Authenticate" (error-to-header data message)}})))})
+  {:as-response
+   (fn [d {:keys [www-authenticate] :as ctx}]
+     (-> (r/as-response d ctx)
+       (assoc-in
+         [:headers "WWW-Authenticate"]
+         (error->header www-authenticate))))})
 
 (defn with-jws-access-token-mixin
   []
   [(with-bearer-token)
    (with-token-authorization)
-   (with-handle-unauthorized-token)])
+   (with-www-authenticate-header)])
 
 (deftype ScopeValidator
   [required-scopes]
