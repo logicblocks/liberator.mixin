@@ -146,12 +146,15 @@
 (deftype ScopeValidator
   [required-scopes]
   ClaimValidator
-  (validate [_ _ claims]
-    (let [scope (:scope claims)]
-      (if
-        (and
-          (some? scope)
-          (every? (set (string/split scope #" ")) required-scopes))
-        [true]
-        [false {:message "Access token failed validation for scope."
-                :cause   {:type :validation :cause :claims}}]))))
+  (validate [_ ctx claims]
+    (let [method (get-in ctx [:request :request-method])]
+      (if-let [required-scopes (or (get required-scopes method) (get required-scopes :any))]
+        (let [scope (:scope claims)]
+          (if
+            (and
+              (some? scope)
+              (every? (set (string/split scope #" ")) required-scopes))
+            [true]
+            [false {:message "Access token failed validation for scope."
+                    :cause   {:type :validation :cause :claims}}]))
+        [true]))))
