@@ -89,11 +89,14 @@
   This mixin should only be used once."
   []
   {:malformed?
-   (fn [{:keys [token resource]}]
+   (fn [{:keys [token resource request]}]
      (let [{:keys [token-required?]
-            :or   {token-required? (constantly true)}} resource]
+            :or   {token-required? (constantly {:any true})}} resource
+           method (:request-method request)
+           token-required? (token-required?)
+           token-required? (or (get token-required? method) (get token-required? :any))]
        (when
-         (and (nil? token) (true? (token-required?)))
+         (and (nil? token) (true? token-required?))
          missing-token)))
    :authorized?
    (fn [{:keys [token resource]}]

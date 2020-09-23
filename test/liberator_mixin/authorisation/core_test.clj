@@ -289,7 +289,7 @@
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
-                     {:token-required? false
+                     {:token-required? {:any false}
                       :handle-ok
                                        (fn [{:keys [routes]}]
                                          routes)})
@@ -298,6 +298,26 @@
                      resource
                      request)]
       (is (= 200 (:status response)))))
+
+  (testing "the token is not required on verb"
+    (let [resource (core/build-resource
+                     (json/with-json-media-type)
+                     (auth/with-jws-access-token-mixin)
+                     {:token-required? {:post true
+                                        :get  false}
+                      :allowed-methods [:post :get]
+                      :handle-ok
+                                       (fn [{:keys [routes]}]
+                                         routes)
+                      :handle-created
+                                       (fn [{:keys [routes]}]
+                                         routes)})]
+      (is (= 200 (:status (call-resource
+                            resource
+                            (ring/request :get "/")))))
+      (is (= 400 (:status (call-resource
+                            resource
+                            (ring/request :post "/")))))))
 
   (testing "the token is not signed with the same key"
     (let [resource (core/build-resource
