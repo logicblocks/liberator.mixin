@@ -42,6 +42,26 @@
                      request)]
       (is (= 200 (:status response)))))
 
+  (testing "the resource is authorised with a function for the name of the authorisation header"
+    (let [resource (core/build-resource
+                     (json/with-json-media-type)
+                     (auth/with-jws-access-token-mixin)
+                     {:token-validators  [(auth/->ScopeValidator {:get #{"read"}})]
+                      :token-key         (fn [_] "foo")
+                      :token-header-name (fn [& _] "x-auth-jwt")
+                      :handle-ok
+                                         (fn [{:keys [routes]}]
+                                           routes)})
+          request (ring/request :get "/")
+          request (ring/header
+                    request
+                    "x-auth-jwt"
+                    (str "Bearer " (sign {:scope "read"} "foo")))
+          response (call-resource
+                     resource
+                     request)]
+      (is (= 200 (:status response)))))
+
   (testing "the resource is authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)

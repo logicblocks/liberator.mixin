@@ -13,14 +13,14 @@
     Params:
     * ctx - liberator context
     * claims - token claims
-    
+
     Returns an array of:
     * valid?
     * error map containing message and cause metadata"))
 
 (defn- parse-header
-  [request token-name token-parser]
-  (let [header (http/-get-header request "authorization")
+  [request token-name token-parser token-header-name]
+  (let [header (http/-get-header request token-header-name)
         cases [(string/capitalize token-name)
                (string/lower-case token-name)
                (string/upper-case token-name)]
@@ -58,6 +58,7 @@
 (defn with-bearer-token
   "Returns a mixin that extracts the access token from the authorisation header
 
+  * token-header-name - the name of the header containing the token (defaults to \"authorization\")
   * token-type - the scheme under the authorisation header (default is Bearer)
   * token-parser - a function that performs parsing of the token before
   validation (optional)
@@ -66,9 +67,10 @@
   []
   {:initialize-context
    (fn [{:keys [request resource]}]
-     (let [token-type (get resource :token-type (constantly "Bearer"))
+     (let [token-header-name (get resource :token-header-name (constantly "authorization"))
+           token-type (get resource :token-type (constantly "Bearer"))
            token-parser (get resource :token-parser identity)
-           token (parse-header request (token-type) token-parser)]
+           token (parse-header request (token-type) token-parser (token-header-name))]
        {:token token}))})
 
 (defn with-token-authorization
