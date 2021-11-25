@@ -9,6 +9,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.0.57] — 2021-11-25
+
 ## [0.0.56] — 2020-09-23
 
 ## [0.0.55] — 2020-09-18
@@ -238,4 +240,5 @@ Released without _CHANGELOG.md_.
 [0.0.54]: https://github.com/b-social/liberator-mixin/compare/0.0.53...0.0.54
 [0.0.55]: https://github.com/b-social/liberator-mixin/compare/0.0.54...0.0.55
 [0.0.56]: https://github.com/b-social/liberator-mixin/compare/0.0.55...0.0.56
-[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.56...HEAD
+[0.0.57]: https://github.com/b-social/liberator-mixin/compare/0.0.56...0.0.57
+[Unreleased]: https://github.com/b-social/liberator-mixin/compare/0.0.57...HEAD
