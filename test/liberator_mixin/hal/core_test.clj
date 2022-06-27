@@ -202,6 +202,23 @@
         (is (some? (:context log-state)))
         (is (some? (:cause log-state)))))))
 
+(deftest with-unauthorized-handler
+  (let [resource (core/build-resource
+                   (hypermedia/with-hypermedia-mixin)
+                   (json/with-json-mixin)
+                   (hal/with-hal-media-type)
+                   (hal/with-unauthorized-handler)
+                   {:authorized? (constantly false)})
+        response (call-resource
+                   resource
+                   (ring/header
+                     (ring/request :get "/")
+                     :accept hal/hal-media-type))]
+    (testing "returns a json response when request is unauthorized"
+      (is (= 401 (:status response)))
+      (is (= "Unauthorized"
+            (get-in response [:body :error]))))))
+
 (deftest with-forbidden-handler
   (let [resource (core/build-resource
                    (hypermedia/with-hypermedia-mixin)
@@ -214,7 +231,7 @@
                    (ring/header
                      (ring/request :get "/")
                      :accept hal/hal-media-type))]
-    (testing "returns a json response when an exception is thrown"
+    (testing "returns a json response when request is forbidden"
       (is (= 403 (:status response)))
       (is (= "Forbidden"
             (get-in response [:body :error]))))))

@@ -129,6 +129,14 @@
        (hal/new-resource)
        {:error not-found-message}))})
 
+(defn with-unauthorized-handler []
+  {:handle-unauthorized
+   (fn [{:keys [unauthorized-message]
+         :or   {unauthorized-message "Unauthorized"}}]
+     (hal/add-properties
+       (hal/new-resource)
+       {:error unauthorized-message}))})
+
 (defn with-forbidden-handler []
   {:handle-forbidden
    (fn [{:keys [forbidden-message]

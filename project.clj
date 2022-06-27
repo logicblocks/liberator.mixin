@@ -9,7 +9,9 @@
                  [halboy "5.1.1"]
                  [b-social/jason "0.1.5"]
                  [b-social/hype "1.0.0"]
-                 [buddy/buddy-auth "2.2.0"]]
+                 [buddy/buddy-auth "2.2.0"]
+                 [com.auth0/java-jwt "3.18.2"
+                  :exclusions [com.fasterxml.jackson.core/jackson-databind]]]
 
   :plugins [[lein-cloverage "1.0.13"]
             [lein-shell "0.5.0"]
