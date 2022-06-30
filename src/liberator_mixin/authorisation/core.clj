@@ -20,16 +20,26 @@
 
 (defn- parse-header
   [request token-name token-parser token-header-name]
-  (let [header (http/-get-header request token-header-name)
-        cases [(string/capitalize token-name)
-               (string/lower-case token-name)
-               (string/upper-case token-name)]
-        pattern (re-pattern
-                  (str "^(?:" (string/join "|" cases) ") (.+)$"))]
-    (some->> header
-      (re-find pattern)
-      (second)
-      (token-parser))))
+  (cond
+    (coll? token-name)
+    (some
+      #(parse-header request % token-parser token-header-name)
+      token-name)
+
+    (nil? token-name)
+    (token-parser (http/-get-header request token-header-name))
+
+    :else
+    (let [header (http/-get-header request token-header-name)
+          cases [(string/capitalize token-name)
+                 (string/lower-case token-name)
+                 (string/upper-case token-name)]
+          pattern (re-pattern
+                    (str "^(?:" (string/join "|" cases) ") (.+)$"))]
+      (some->> header
+        (re-find pattern)
+        (second)
+        (token-parser)))))
 
 (defn- is-valid?
   [ctx validators claims]
@@ -59,7 +69,8 @@
   "Returns a mixin that extracts the access token from the authorisation header
 
   * token-header-name - the name of the header containing the token (defaults to \"authorization\")
-  * token-type - the scheme under the authorisation header (default is Bearer)
+  * token-type - the scheme or a list of schemes under the authorisation header (default is Bearer).
+                  Use nil when no type on header
   * token-parser - a function that performs parsing of the token before
   validation (optional)
 

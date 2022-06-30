@@ -6,8 +6,7 @@
            [java.util Base64]))
 
 (defn- get-jwt-payload [token]
-  (let [token-string (second (string/split token #" "))
-        jwt (.decodeJwt (new JWT) token-string)
+  (let [jwt (.decodeJwt (new JWT) token)
         payload (.getPayload jwt)
         decoded-payload (-> (.decode (Base64/getDecoder) payload)
                           (String.)
@@ -18,9 +17,9 @@
 
 (defn with-jwt-scopes []
   {:authorized?
-   (fn [{:keys [request]}]
+   (fn [{:keys [token]}]
      (try
-       (if-let [token (get-in request [:headers "x-auth-jwt"])]
+       (if (some? token)
          (let [
                decoded-payload (get-jwt-payload token)
                scope-string (->>
