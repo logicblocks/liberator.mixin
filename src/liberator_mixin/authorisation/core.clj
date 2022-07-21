@@ -101,23 +101,26 @@
 
   This mixin should only be used once."
   []
-  {:malformed?
+  {:authorized?
    (fn [{:keys [token resource request]}]
      (let [{:keys [token-required?]
             :or   {token-required? (constantly {:any true})}} resource
            method (:request-method request)
            token-required? (token-required?)
-           token-required? (or (get token-required? method) (get token-required? :any))]
-       (when
-         (and (nil? token) (true? token-required?))
-         missing-token)))
-   :authorized?
-   (fn [{:keys [token resource]}]
-     (let [{:keys [token-options token-key]
+           token-required? (or (get token-required? method) (get token-required? :any))
+
+           {:keys [token-options token-key]
             :or   {token-options (constantly {})}} resource]
-       (if (some? token)
+       (cond
+         (some? token)
          (token->identity token-key (token-options) token)
+
+         (true? token-required?)
+         [false missing-token]
+
+         :else
          true)))
+
    :allowed?
    (fn [{:keys [identity resource] :as ctx}]
      (if (some? identity)

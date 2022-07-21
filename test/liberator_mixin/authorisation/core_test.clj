@@ -22,7 +22,7 @@
   auth/ClaimValidator
   (validate [_ _ _] [false]))
 
-(deftest with-jws-authorisation
+(deftest with-function-for-key
   (testing "the resource is authorised with a function for the key"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -30,8 +30,8 @@
                      {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
                       :token-key        (fn [_] "foo")
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -40,8 +40,9 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest with-function-for-auth-header
   (testing "the resource is authorised with a function for the name of the authorisation header"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -50,8 +51,8 @@
                       :token-key         (fn [_] "foo")
                       :token-header-name (fn [& _] "x-auth-jwt")
                       :handle-ok
-                                         (fn [{:keys [routes]}]
-                                           routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -60,8 +61,9 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest with-right-scopes
   (testing "the resource is authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -91,8 +93,9 @@
                           resource
                           post-request)]
       (is (= 200 (:status response)))
-      (is (= 201 (:status post-response)))))
+      (is (= 201 (:status post-response))))))
 
+(deftest not-authorised-with-multiple-claims
   (testing "the resource is not authorised with multiple claims"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -100,8 +103,8 @@
                      {:token-validators [(auth/->ScopeValidator {:get #{"read"}}), (FailedValidator.)]
                       :token-key        "foo"
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -114,8 +117,9 @@
       (is (= 403 (:status response)))
       (is (string/includes?
             header
-            "Access token failed validation."))))
+            "Access token failed validation.")))))
 
+(deftest not-authorised-with-multiple-claims-first
   (testing "the resource is not authorised with multiple claims contains first"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -123,8 +127,8 @@
                      {:token-validators [(auth/->ScopeValidator {:get #{"write"}}), (FailedValidator.)]
                       :token-key        "foo"
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -137,8 +141,9 @@
       (is (= 403 (:status response)))
       (is (string/includes?
             header
-            "Access token failed validation for scope."))))
+            "Access token failed validation for scope.")))))
 
+(deftest bearer-any-case
   (testing "the resource doesnt care about the case of bearer"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -146,8 +151,8 @@
                      {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
                       :token-key        "foo"
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -156,8 +161,9 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest with-different-token-scheme
   (testing "the resource is authorised with a different token scheme"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -166,8 +172,8 @@
                       :token-type       "Token"
                       :token-key        "foo"
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -176,8 +182,9 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest with-encoding
   (testing "the resource is authorised when encoded"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -188,8 +195,8 @@
                                             (buddy.core.codecs/bytes->str)))
                       :token-key        "foo"
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -200,16 +207,17 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest when-no-scopes-required
   (testing "the resource is authorised when no scopes required"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
-                                 (fn [{:keys [routes]}]
-                                   routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -218,8 +226,9 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest with-right-scopes-available
   (testing "the resource is not authorised with the right scopes available"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -259,8 +268,9 @@
       (is (= 403 (:status post-response)))
       (is (string/includes?
             post-header
-            "Access token failed validation for scope."))))
+            "Access token failed validation for scope.")))))
 
+(deftest with-wrong-scope-claim
   (testing "the resource does not have scope claim"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -268,8 +278,8 @@
                      {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
                       :token-key        "foo"
                       :handle-ok
-                                        (fn [{:keys [routes]}]
-                                          routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -281,16 +291,17 @@
           header (get-in response [:headers "WWW-Authenticate"])]
       (is (= 403 (:status response)))
       (is (string/includes? header
-            "Access token failed validation for scope."))))
+            "Access token failed validation for scope.")))))
 
+(deftest with-token-under-wrong-identifier
   (testing "the token is under the wrong identifier"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
-                                 (fn [{:keys [routes]}]
-                                   routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -300,25 +311,27 @@
                      resource
                      request)
           header (get-in response [:headers "WWW-Authenticate"])]
-      (is (= 400 (:status response)))
+      (is (= 401 (:status response)))
       (is (string/includes?
             header
-            "Authorisation header does not contain a token."))))
+            "Authorisation header does not contain a token.")))))
 
+(deftest with-token-not-required
   (testing "the token is not required"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-required? {:any false}
                       :handle-ok
-                                       (fn [{:keys [routes]}]
-                                         routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           response (call-resource
                      resource
                      request)]
-      (is (= 200 (:status response)))))
+      (is (= 200 (:status response))))))
 
+(deftest with-token-not-required-on-verb
   (testing "the token is not required on verb"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -327,26 +340,27 @@
                                         :get  false}
                       :allowed-methods [:post :get]
                       :handle-ok
-                                       (fn [{:keys [routes]}]
-                                         routes)
+                      (fn [{:keys [routes]}]
+                        routes)
                       :handle-created
-                                       (fn [{:keys [routes]}]
-                                         routes)})]
+                      (fn [{:keys [routes]}]
+                        routes)})]
       (is (= 200 (:status (call-resource
                             resource
                             (ring/request :get "/")))))
-      (is (= 400 (:status (call-resource
+      (is (= 401 (:status (call-resource
                             resource
-                            (ring/request :post "/")))))))
+                            (ring/request :post "/"))))))))
 
+(deftest with-token-not-signed-with-same-key
   (testing "the token is not signed with the same key"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
-                                 (fn [{:keys [routes]}]
-                                   routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -359,16 +373,17 @@
       (is (= 401 (:status response)))
       (is (string/includes?
             header
-            "Message seems corrupt or manipulated."))))
+            "Message seems corrupt or manipulated.")))))
 
+(deftest with-expired-token
   (testing "the token has expired"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
                       :handle-ok
-                                 (fn [{:keys [routes]}]
-                                   routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           expiry-time (tc/to-epoch (time/ago (time/minutes 5)))
           request (ring/header
@@ -380,8 +395,9 @@
           response (call-resource
                      resource
                      request)]
-      (is (= 401 (:status response)))))
+      (is (= 401 (:status response))))))
 
+(deftest with-invalid-audience
   (testing "does not meet the required audience"
     (let [resource (core/build-resource
                      (json/with-json-media-type)
@@ -389,8 +405,8 @@
                      {:token-key     "foo"
                       :token-options {:aud "pms.com"}
                       :handle-ok
-                                     (fn [{:keys [routes]}]
-                                       routes)})
+                      (fn [{:keys [routes]}]
+                        routes)})
           request (ring/request :get "/")
           request (ring/header
                     request
