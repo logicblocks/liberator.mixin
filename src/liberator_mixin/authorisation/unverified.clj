@@ -17,20 +17,35 @@
 
 (defn with-jwt-scopes []
   {:authorized?
-   (fn [{:keys [token]}]
-     (try
-       (if (some? token)
-         (let [
-               decoded-payload (get-jwt-payload token)
-               scope-string (->>
-                              (filter scope? decoded-payload)
-                              (first)
-                              (val))
+   (fn [{:keys [token resource request]}]
+     (let [{:keys [token-required?]
+            :or   {token-required? (constantly true)}} resource
+           method (:request-method request)
+           token-required? (token-required?)
+           token-required? (or
+                             (true? token-required?)
+                             (get token-required? method)
+                             (get token-required? :any))]
 
-               scopes (set (string/split scope-string #" "))]
-           [true {:scopes scopes}])
-         [false {:www-authenticate {:message   "No x-auth-jwt token"
-                                    :error     "invalid_token"}}])
-       (catch Exception e
-         [false {:www-authenticate {:message   (ex-message e)
-                                    :error     "invalid_token"}}])))})
+       (cond
+         (some? token)
+         (try
+           (let [
+                 decoded-payload (get-jwt-payload token)
+                 scope-string (->>
+                                (filter scope? decoded-payload)
+                                (first)
+                                (val))
+
+                 scopes (set (string/split scope-string #" "))]
+             [true {:scopes scopes}])
+           (catch Exception e
+             [false {:www-authenticate {:message (ex-message e)
+                                        :error   "invalid_token"}}]))
+
+         (true? token-required?)
+         [false {:www-authenticate {:message "No x-auth-jwt token"
+                                    :error   "invalid_token"}}]
+
+         :default
+         true)))})

@@ -117,3 +117,42 @@
     (testing "provided correct scopes to allowed function"
       (is (= 200 (:status response-1)))
       (is (= 200 (:status response-2))))))
+
+(deftest with-jwt-scopes-token-not-required-given-no-jwt
+  (let [handler (core/build-resource
+                  (json/with-json-media-type)
+                  (auth/with-bearer-token)
+                  (with-jwt-scopes)
+                  (auth/with-www-authenticate-header)
+                  {:token-header-name "x-auth-jwt"
+                   :token-required? false})
+
+        request (ring/request :get "/")
+
+        response (handler request)]
+    (testing "provided correct scopes to allowed function"
+      (is (= 200 (:status response))))))
+
+(deftest with-jwt-scopes-token-not-required-for-method-given-no-jwt
+  (let [handler (core/build-resource
+                  (json/with-json-media-type)
+                  (auth/with-bearer-token)
+                  (with-jwt-scopes)
+                  (auth/with-www-authenticate-header)
+                  {:allowed-methods [:get :post]
+                   :token-header-name "x-auth-jwt"
+                   :token-required?   {:get  false
+                                       :post true}})
+
+        get-response (handler (ring/request :get "/"))
+        post-response (handler (ring/request :post "/"))
+        post-header (get-in post-response [:headers "WWW-Authenticate"])
+        ]
+    (testing "provided correct scopes to allowed function"
+      (is (= 200 (:status get-response))))
+
+    (testing "has Unauthorized status"
+      (is (= 401 (:status post-response))))
+    (testing "has appropriate error message"
+      (is (string/includes? post-header "error=\"invalid_token\""))
+      (is (string/includes? post-header "error_message=\"No x-auth-jwt token\"")))))
