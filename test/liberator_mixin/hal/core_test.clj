@@ -235,3 +235,20 @@
       (is (= 403 (:status response)))
       (is (= "Forbidden"
             (get-in response [:body :error]))))))
+
+(deftest with-method-not-allowed-handler
+  (let [resource (core/build-resource
+                   (hypermedia/with-hypermedia-mixin)
+                   (json/with-json-mixin)
+                   (hal/with-hal-media-type)
+                   (hal/with-method-not-allowed-handler)
+                   {:allowed-methods [:get]})
+        response (call-resource
+                   resource
+                   (ring/header
+                     (ring/request :post "/" {})
+                     :accept hal/hal-media-type))]
+    (testing "returns a json response when request method is not allowed"
+      (is (= 405 (:status response)))
+      (is (= "Method not allowed"
+            (get-in response [:body :error]))))))

@@ -145,7 +145,19 @@
        (hal/new-resource)
        {:error forbidden-message}))})
 
+(defn with-method-not-allowed-handler []
+  {:handle-method-not-allowed
+   (fn [{:keys [method-not-allowed-message]
+         :or   {method-not-allowed-message "Method not allowed"}}]
+     (hal/add-properties
+       (hal/new-resource)
+       {:error method-not-allowed-message}))})
+
 (defn with-hal-mixin [_]
   [(with-hal-media-type)
    (with-hal-error-representation)
-   (with-not-found-handler)])
+   (with-exception-handler)
+   (with-not-found-handler)
+   (with-unauthorized-handler)
+   (with-forbidden-handler)
+   (with-method-not-allowed-handler)])
