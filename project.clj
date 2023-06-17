@@ -1,14 +1,14 @@
-(defproject b-social/liberator-mixin "0.0.62-SNAPSHOT"
-  :description "An extension to liberator allowing for composable mixins."
-  :url "https://github.com/b-social/liberator-mixin"
+(defproject io.logicblocks/liberator-mixin "0.0.62-SNAPSHOT"
+  :description "Extensions for liberator allowing for composable mixins."
+  :url "https://github.com/logicblocks/liberator-mixin"
 
   :license {:name "The MIT License"
             :url  "https://opensource.org/licenses/MIT"}
 
   :dependencies [[liberator "0.15.3"]
-                 [halboy "5.1.1"]
-                 [b-social/jason "0.1.5"]
-                 [b-social/hype "1.0.0"]
+                 [io.logicblocks/halboy "6.0.0"]
+                 [io.logicblocks/jason "1.0.0"]
+                 [io.logicblocks/hype "2.0.0"]
                  [buddy/buddy-auth "2.2.0"]
                  [com.auth0/java-jwt "3.18.2"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]]
@@ -41,7 +41,7 @@
    :metadata    {:doc/format :markdown}
    :output-path "docs"
    :doc-paths   ["docs"]
-   :source-uri  "https://github.com/b-social/liberator-mixin/blob/{version}/{filepath}#L{line}"}
+   :source-uri  "https://github.com/logicblocks/liberator-mixin/blob/{version}/{filepath}#L{line}"}
 
   :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}
 

@@ -1,18 +1,22 @@
 # liberator-mixin
 
-An extension to liberator allowing for composable mixins.
+[![Clojars Project](https://img.shields.io/clojars/v/io.logicblocks/liberator-mixin.svg)](https://clojars.org/io.logicblocks/liberator-mixin)
+[![Clojars Downloads](https://img.shields.io/clojars/dt/io.logicblocks/liberator-mixin.svg)](https://clojars.org/io.logicblocks/liberator-mixin)
+[![GitHub Contributors](https://img.shields.io/github/contributors-anon/logicblocks/liberator-mixin.svg)](https://github.com/logicblocks/liberator-mixin/graphs/contributors)
+
+Extensions for liberator allowing for composable mixins.
 
 ## Install
 
 Add the following to your `project.clj` file:
 
-```clj
-[b-social/liberator-mixin "0.0.61"]
+```clojure
+[io.logicblocks/liberator-mixin "0.0.61"]
 ```
 
 ## Documentation
 
-* [API Docs](http://b-social.github.io/liberator-mixin)
+* [API Docs](http://logicblocks.github.io/liberator-mixin)
 
 ## Usage
 
@@ -24,28 +28,13 @@ FIXME
 
 Run tests using:
 
-```
+```shell
 lein test
 ```
 
-### Releasing a new version
-
-Prerequisites:
-- You must have git configured with your GPG credentials (https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work).
-- You must have lein configured with your Clojars credentials (instructions: https://github.com/technomancy/leiningen/blob/master/doc/DEPLOY.md#gpg).
-- You must be a member of the b-social group on Clojars.
-
-You should then be able to run:
-```
-lein release
-```
-
-This will handle changing the versions everywhere, and adding the version tags.
-It will deploy the latest to Clojars and push all the changes to GitHub.
-
 ## License
 
-Copyright © 2018 B-Social Ltd.
+Copyright &copy; 2023 LogicBlocks Maintainers
 
-Distributed under the terms of the 
+Distributed under the terms of the
 [MIT License](http://opensource.org/licenses/MIT).
