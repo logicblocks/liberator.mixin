@@ -1,10 +1,7 @@
 (ns liberator-mixin.validation.core
-  (:require
-    [halboy.resource :as hal]
-
-    [liberator.util :refer [by-method]])
+  (:refer-clojure :exclude [random-uuid])
   (:import
-    [java.util UUID]))
+   [java.util UUID]))
 
 (defn- random-uuid []
   (str (UUID/randomUUID)))

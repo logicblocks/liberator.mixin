@@ -1,20 +1,20 @@
 (ns liberator-mixin.json.core-test
   (:require
-    [clojure.test :refer :all]
+   [clojure.test :refer :all]
 
-    [camel-snake-kebab.core
-     :refer [->snake_case_keyword
-             ->snake_case_string]]
+   [camel-snake-kebab.core
+    :refer [->snake_case_keyword
+            ->snake_case_string]]
 
-    [ring.mock.request :as ring]
-    [ring.middleware.params :as params]
-    [ring.middleware.keyword-params :as keyword-params]
+   [ring.mock.request :as ring]
+   [ring.middleware.params :as params]
+   [ring.middleware.keyword-params :as keyword-params]
 
-    [jason.core :as jason]
-    [jason.convenience :as jason-conv]
+   [jason.core :as jason]
+   [jason.convenience :as jason-conv]
 
-    [liberator-mixin.core :as l]
-    [liberator-mixin.json.core :as json]))
+   [liberator-mixin.core :as l]
+   [liberator-mixin.json.core :as json]))
 
 (defn call-resource [resource request]
   (->

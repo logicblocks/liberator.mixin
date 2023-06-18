@@ -1,15 +1,15 @@
 (ns liberator-mixin.context.core-test
   (:require
-    [clojure.test :refer :all]
-    [clojure.string :as string]
+   [clojure.test :refer :all]
+   [clojure.string :as string]
 
-    [jason.convenience :as jason-conv]
+   [jason.convenience :as jason-conv]
 
-    [ring.mock.request :as ring]
+   [ring.mock.request :as ring]
 
-    [liberator-mixin.core :as core]
-    [liberator-mixin.context.core :as context]
-    [liberator-mixin.json.core :as json]))
+   [liberator-mixin.core :as core]
+   [liberator-mixin.context.core :as context]
+   [liberator-mixin.json.core :as json]))
 
 (defn call-resource [resource request]
   (->

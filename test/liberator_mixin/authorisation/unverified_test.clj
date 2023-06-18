@@ -1,15 +1,14 @@
 (ns liberator-mixin.authorisation.unverified-test
   (:require
-    [clojure.test :refer :all]
+   [clojure.test :refer :all]
 
-    [ring.mock.request :as ring]
-    [buddy.sign.jwt :refer [sign]]
-    [liberator-mixin.core :as core]
-    [liberator-mixin.authorisation.core :as auth]
-    [liberator-mixin.authorisation.unverified :refer [with-jwt-scopes]]
-    [liberator-mixin.json.core :as json]
-    [clojure.string :as string]))
-
+   [ring.mock.request :as ring]
+   [buddy.sign.jwt :refer [sign]]
+   [liberator-mixin.core :as core]
+   [liberator-mixin.authorisation.core :as auth]
+   [liberator-mixin.authorisation.unverified :refer [with-jwt-scopes]]
+   [liberator-mixin.json.core :as json]
+   [clojure.string :as string]))
 
 (deftest with-jwt-scopes-given-no-jwt
   (let [handler (core/build-resource
@@ -48,7 +47,8 @@
       (is (string/includes? header
             "error=\"invalid_token\""))
       (is (string/includes? header
-            "error_message=\"The token was expected to have 3 parts, but got 1.\"")))))
+            (str "error_message="
+              "\"The token was expected to have 3 parts, but got 1.\""))))))
 
 (deftest with-jwt-scopes-given-jwt-with-scopes
   (let [handler (core/build-resource
@@ -65,7 +65,7 @@
         request (ring/header
                   (ring/request :get "/")
                   "x-auth-jwt"
-                   (sign {:scope "read write"} "bar"))
+                  (sign {:scope "read write"} "bar"))
 
         response (handler request)]
     (testing "provided correct scopes to allowed function"
@@ -104,9 +104,9 @@
                      (= scopes #{"read" "write"}))})
 
         request-1 (ring/header
-                  (ring/request :get "/")
-                  "x-auth-jwt"
-                  (str "bearer " (sign {:scope "read write"} "bar")))
+                    (ring/request :get "/")
+                    "x-auth-jwt"
+                    (str "bearer " (sign {:scope "read write"} "bar")))
         response-1 (handler request-1)
 
         request-2 (ring/header
@@ -146,8 +146,7 @@
 
         get-response (handler (ring/request :get "/"))
         post-response (handler (ring/request :post "/"))
-        post-header (get-in post-response [:headers "WWW-Authenticate"])
-        ]
+        post-header (get-in post-response [:headers "WWW-Authenticate"])]
     (testing "provided correct scopes to allowed function"
       (is (= 200 (:status get-response))))
 
@@ -155,4 +154,5 @@
       (is (= 401 (:status post-response))))
     (testing "has appropriate error message"
       (is (string/includes? post-header "error=\"invalid_token\""))
-      (is (string/includes? post-header "error_message=\"No x-auth-jwt token\"")))))
+      (is (string/includes? post-header
+            "error_message=\"No x-auth-jwt token\"")))))

@@ -6,11 +6,12 @@
   The most important function in this namespace is [[build-resource]] which
   accepts a sequence of liberator mixins (or resource definition maps) and
   produces a liberator resource."
+  (:refer-clojure :exclude [random-uuid comparator])
   (:require
-    [clojure.string :as str]
+   [clojure.string :as str]
 
-    [liberator.core :as liberator]
-    [liberator.util :as liberator-util]))
+   [liberator.core :as liberator]
+   [liberator.util :as liberator-util]))
 
 (defn is-decision?
   "Returns `true` if `k`, a keyword, represents a liberator decision, `false`
@@ -126,22 +127,22 @@
   (fn merged
     ([] (merged {}))
     ([context]
-      (let [left-conf ((liberator-util/make-function left) context)
-            right-conf ((liberator-util/make-function right) context)]
-        (cond
-          (-> right-conf meta :replace)
-          right-conf
+     (let [left-conf ((liberator-util/make-function left) context)
+           right-conf ((liberator-util/make-function right) context)]
+       (cond
+         (-> right-conf meta :replace)
+         right-conf
 
-          (and (list? left-conf) (coll? right-conf))
-          (apply list (concat right-conf left-conf))
+         (and (list? left-conf) (coll? right-conf))
+         (apply list (concat right-conf left-conf))
 
-          (and (vector? left-conf) (coll? right-conf))
-          (into right-conf left-conf)
+         (and (vector? left-conf) (coll? right-conf))
+         (into right-conf left-conf)
 
-          (and (set? left-conf) (coll? right-conf))
-          (into left-conf right-conf)
+         (and (set? left-conf) (coll? right-conf))
+         (into left-conf right-conf)
 
-          :otherwise right-conf)))))
+         :otherwise right-conf)))))
 
 (def or-decisions
   #{:malformed?

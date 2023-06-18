@@ -1,7 +1,7 @@
 (ns liberator-mixin.authorisation.unverified
   (:require
-    [clojure.string :as string]
-    [clojure.data.json :as json])
+   [clojure.string :as string]
+   [clojure.data.json :as json])
   (:import [com.auth0.jwt JWT]
            [java.util Base64]))
 
@@ -30,8 +30,7 @@
        (cond
          (some? token)
          (try
-           (let [
-                 decoded-payload (get-jwt-payload token)
+           (let [decoded-payload (get-jwt-payload token)
                  scope-string (->>
                                 (filter scope? decoded-payload)
                                 (first)

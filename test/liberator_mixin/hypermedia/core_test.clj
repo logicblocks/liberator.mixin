@@ -1,14 +1,14 @@
 (ns liberator-mixin.hypermedia.core-test
   (:require
-    [clojure.test :refer :all]
+   [clojure.test :refer :all]
 
-    [ring.mock.request :as ring]
+   [ring.mock.request :as ring]
 
-    [jason.convenience :as jason-conv]
+   [jason.convenience :as jason-conv]
 
-    [liberator-mixin.core :as core]
-    [liberator-mixin.json.core :as json]
-    [liberator-mixin.hypermedia.core :as hypermedia]))
+   [liberator-mixin.core :as core]
+   [liberator-mixin.json.core :as json]
+   [liberator-mixin.hypermedia.core :as hypermedia]))
 
 (defn call-resource [resource request]
   (->

@@ -1,11 +1,11 @@
 (ns liberator-mixin.core-test
   (:require
-    [clojure.test :refer :all]
+   [clojure.test :refer :all]
 
-    [liberator.util :as util]
+   [liberator.util :as util]
 
-    [liberator-mixin.core :as core]
-    [liberator-mixin.test-support :as ts]))
+   [liberator-mixin.core :as core]
+   [liberator-mixin.test-support :as ts]))
 
 ; how should we merge:
 ; :location -> fn or constant

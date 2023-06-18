@@ -39,19 +39,20 @@
   `:routes` to be available in the `context`, containing a route named
   `:discovery`. The [[liberator-mixin.hypermedia.core|hypermedia mixin]] adds
   routes to the `context` so nothing further is needed if that mixin is in use."
+  (:refer-clojure :exclude [random-uuid])
   (:require
-    [halboy.resource :as hal]
-    [liberator.representation :as r]
+   [halboy.resource :as hal]
+   [liberator.representation :as r]
 
-    [halboy.json :as haljson]
+   [halboy.json :as haljson]
 
-    [hype.core :as hype]
+   [hype.core :as hype]
 
-    [liberator-mixin.logging.core :as log]
-    [jason.convenience :as jason-conv])
+   [liberator-mixin.logging.core :as log]
+   [jason.convenience :as jason-conv])
   (:import
-    [halboy.resource Resource]
-    [java.util UUID]))
+   [halboy.resource Resource]
+   [java.util UUID]))
 
 (defn- random-uuid []
   (str (UUID/randomUUID)))

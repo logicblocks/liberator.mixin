@@ -1,13 +1,13 @@
 (ns liberator-mixin.json.core
   (:require
-    [clojure.string :refer [starts-with?]]
+   [clojure.string :refer [starts-with?]]
 
-    [jason.convenience :as jason-conv]
+   [jason.convenience :as jason-conv]
 
-    [liberator.representation :as r]
-    [liberator-mixin.context.core :refer [with-attribute-in-context]])
+   [liberator.representation :as r]
+   [liberator-mixin.context.core :refer [with-attribute-in-context]])
   (:import
-    [com.fasterxml.jackson.core JsonParseException]))
+   [com.fasterxml.jackson.core JsonParseException]))
 
 (defn- json-request? [request]
   (if-let [type (get-in request [:headers "content-type"])]
@@ -74,10 +74,10 @@
 (defn with-json-mixin
   ([] (with-json-mixin {}))
   ([dependencies]
-    [(with-json-encoder
-       (get-in dependencies [:json :encoder] jason-conv/->wire-json))
-     (with-json-decoder
-       (get-in dependencies [:json :decoder] jason-conv/<-wire-json))
-     (with-json-media-type)
-     (with-body-parsed-as-json)
-     (with-params-parsed-as-json)]))
+   [(with-json-encoder
+      (get-in dependencies [:json :encoder] jason-conv/->wire-json))
+    (with-json-decoder
+      (get-in dependencies [:json :decoder] jason-conv/<-wire-json))
+    (with-json-media-type)
+    (with-body-parsed-as-json)
+    (with-params-parsed-as-json)]))

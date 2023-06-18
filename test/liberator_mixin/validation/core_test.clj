@@ -1,15 +1,15 @@
 (ns liberator-mixin.validation.core-test
   (:require
-    [clojure.test :refer :all]
+   [clojure.test :refer :all]
 
-    [ring.mock.request :as ring]
+   [ring.mock.request :as ring]
 
-    [jason.convenience :as jason-conv]
+   [jason.convenience :as jason-conv]
 
-    [liberator.util :refer [by-method]]
-    [liberator-mixin.core :as core]
-    [liberator-mixin.json.core :as json]
-    [liberator-mixin.validation.core :as validation]))
+   [liberator.util :refer [by-method]]
+   [liberator-mixin.core :as core]
+   [liberator-mixin.json.core :as json]
+   [liberator-mixin.validation.core :as validation]))
 
 (defn assert-valid-context [context]
   (when-not (:request context)
