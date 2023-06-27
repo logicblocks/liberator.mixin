@@ -1,6 +1,6 @@
-(defproject io.logicblocks/liberator-mixin "0.1.0-RC0"
+(defproject io.logicblocks/liberator.mixin "0.1.0-RC0"
   :description "Extensions for liberator allowing for composable mixins."
-  :url "https://github.com/logicblocks/liberator-mixin"
+  :url "https://github.com/logicblocks/liberator.mixin"
 
   :license {:name "The MIT License"
             :url  "https://opensource.org/licenses/MIT"}
@@ -77,11 +77,11 @@
   {:ns-exclude-regex [#"^user"]}
 
   :codox
-  {:namespaces  [#"^liberator-mixin\."]
+  {:namespaces  [#"^liberator\.mixin\."]
    :metadata    {:doc/format :markdown}
    :output-path "docs"
    :doc-paths   ["docs"]
-   :source-uri  "https://github.com/logicblocks/liberator-mixin/blob/{version}/{filepath}#L{line}"}
+   :source-uri  "https://github.com/logicblocks/liberator.mixin/blob/{version}/{filepath}#L{line}"}
 
   :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}
 

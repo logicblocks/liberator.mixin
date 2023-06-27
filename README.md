@@ -1,8 +1,8 @@
-# liberator-mixin
+# liberator.mixin
 
-[![Clojars Project](https://img.shields.io/clojars/v/io.logicblocks/liberator-mixin.svg)](https://clojars.org/io.logicblocks/liberator-mixin)
-[![Clojars Downloads](https://img.shields.io/clojars/dt/io.logicblocks/liberator-mixin.svg)](https://clojars.org/io.logicblocks/liberator-mixin)
-[![GitHub Contributors](https://img.shields.io/github/contributors-anon/logicblocks/liberator-mixin.svg)](https://github.com/logicblocks/liberator-mixin/graphs/contributors)
+[![Clojars Project](https://img.shields.io/clojars/v/io.logicblocks/liberator.mixin.svg)](https://clojars.org/io.logicblocks/liberator.mixin)
+[![Clojars Downloads](https://img.shields.io/clojars/dt/io.logicblocks/liberator.mixin.svg)](https://clojars.org/io.logicblocks/liberator.mixin)
+[![GitHub Contributors](https://img.shields.io/github/contributors-anon/logicblocks/liberator.mixin.svg)](https://github.com/logicblocks/liberator.mixin/graphs/contributors)
 
 Extensions for liberator allowing for composable mixins.
 
@@ -11,12 +11,12 @@ Extensions for liberator allowing for composable mixins.
 Add the following to your `project.clj` file:
 
 ```clojure
-[io.logicblocks/liberator-mixin "0.0.61"]
+[io.logicblocks/liberator.mixin "0.0.61"]
 ```
 
 ## Documentation
 
-* [API Docs](http://logicblocks.github.io/liberator-mixin)
+* [API Docs](http://logicblocks.github.io/liberator.mixin)
 
 ## Usage
 

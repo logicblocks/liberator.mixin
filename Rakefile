@@ -119,7 +119,7 @@ end
 
 RakeCircleCI.define_project_tasks(
   namespace: :circle_ci,
-  project_slug: 'github/logicblocks/liberator-mixin'
+  project_slug: 'github/logicblocks/liberator.mixin'
 ) do |t|
   circle_ci_config =
     YAML.load_file('config/secrets/circle_ci/config.yaml')
@@ -141,7 +141,7 @@ end
 
 RakeGithub.define_repository_tasks(
   namespace: :github,
-  repository: 'logicblocks/liberator-mixin'
+  repository: 'logicblocks/liberator.mixin'
 ) do |t|
   github_config =
     YAML.load_file('config/secrets/github/config.yaml')

@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Forked from `b-social/liberator-mixin`.
+- Rename library to `liberator.mixin`
+
 ## [0.0.61] — 2023-01-10
 
 ## [0.0.60] — 2022-07-29
