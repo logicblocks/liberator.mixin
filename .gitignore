@@ -1,14 +1,18 @@
 /target
+/**/target
 /classes
+/**/classes
 /checkouts
+/**/checkouts
 profiles.clj
 pom.xml
 pom.xml.asc
 *.jar
 *.class
 /.lein-*
+/**/.lein-*
 /.nrepl-port
-/run
+/**/.nrepl-port
 .hgignore
 .bundle
 .hg/
@@ -16,6 +20,7 @@ pom.xml.asc
 *.iws
 *.ipr
 .DS_Store
+/run
 /vendor
 .eastwood
 /.idea
