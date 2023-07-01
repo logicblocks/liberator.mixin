@@ -1,80 +1,100 @@
 (defproject io.logicblocks/liberator.mixin "0.1.0-RC0"
   :description "Extensions for liberator allowing for composable mixins."
-  :url "https://github.com/logicblocks/liberator.mixin"
 
-  :license {:name "The MIT License"
-            :url  "https://opensource.org/licenses/MIT"}
+  :parent-project {:path    "parent/project.clj"
+                   :inherit [:scm
+                             :url
+                             :license
+                             :plugins
+                             [:profiles :parent-shared]
+                             :deploy-repositories
+                             :managed-dependencies]}
 
-  :dependencies [[liberator "0.15.3"]
-                 [io.logicblocks/halboy "6.0.0"]
-                 [io.logicblocks/jason "1.0.0"]
-                 [io.logicblocks/hype "2.0.0"]
-                 [buddy/buddy-auth "2.2.0"]
-                 [tick "0.6.2"]
-                 [com.auth0/java-jwt "3.18.2"
-                  :exclusions [com.fasterxml.jackson.core/jackson-databind]]]
-
-  :plugins [[lein-cloverage "1.2.4"]
-            [lein-shell "0.5.0"]
-            [lein-ancient "0.7.0"]
+  :plugins [[io.logicblocks/lein-interpolate "0.1.1-RC2"]
+            [lein-parent "0.3.9"]
+            [lein-sub "0.3.0"]
             [lein-changelog "0.3.2"]
-            [lein-cprint "1.3.3"]
-            [lein-eftest "0.6.0"]
-            [lein-codox "0.10.8"]
-            [lein-cljfmt "0.9.2"]
-            [lein-kibit "0.1.8"]
-            [lein-bikeshed "0.5.2"]
-            [jonase/eastwood "1.4.0"]]
+            [lein-codox "0.10.8"]]
+
+  :sub ["parent"
+        "core"
+        "context"
+        "logging"
+        "json"
+        "authorisation"
+        "hypermedia"
+        "hal"
+        "validation"
+        "."]
+
+  :dependencies [[io.logicblocks/liberator.mixin.core]
+                 [io.logicblocks/liberator.mixin.authorisation]
+                 [io.logicblocks/liberator.mixin.context]
+                 [io.logicblocks/liberator.mixin.hal]
+                 [io.logicblocks/liberator.mixin.hypermedia]
+                 [io.logicblocks/liberator.mixin.json]
+                 [io.logicblocks/liberator.mixin.logging]
+                 [io.logicblocks/liberator.mixin.validation]]
 
   :profiles
-  {:shared
-   ^{:pom-scope :test}
-   {:dependencies
-    [[org.clojure/clojure "1.11.1"]
-     [camel-snake-kebab "0.4.3"]
-     [ring/ring-core "1.10.0"]
-     [ring/ring-mock "0.4.0"]
-     [eftest "0.6.0"]]}
+  {:unit
+   {:aliases {"eftest"
+              ["sub"
+               "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+               "with-profile" "unit"
+               "eftest"]}}
 
-   :dev
-   [:shared {:source-paths ["dev"]
-             :eftest       {:multithread? false}}]
+   :codox
+   [:parent-shared
+    {:dependencies [[io.logicblocks/liberator.mixin.core :project/version]
 
-   :test
-   [:shared {:eftest {:multithread? false}}]
+                    [tick]]
+     :source-paths ["core/src"
+                    "authorisation/src"
+                    "context/src"
+                    "hal/src"
+                    "hypermedia/src"
+                    "json/src"
+                    "logging/src"
+                    "validation/src"]}]
 
    :prerelease
    {:release-tasks
-    [["shell" "git" "diff" "--exit-code"]
-     ["change" "version" "leiningen.release/bump-version" "rc"]
-     ["change" "version" "leiningen.release/bump-version" "release"]
+    [
+     ["vcs" "assert-committed"]
+     ["sub" "change" "version" "leiningen.release/bump-version" "rc"]
+     ["sub" "change" "version" "leiningen.release/bump-version" "release"]
      ["vcs" "commit" "Pre-release version %s [skip ci]"]
      ["vcs" "tag"]
-     ["deploy"]]}
+     ["sub" "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation:." "deploy"]]}
 
    :release
    {:release-tasks
-    [["shell" "git" "diff" "--exit-code"]
-     ["change" "version" "leiningen.release/bump-version" "release"]
-     ["codox"]
+    [["vcs" "assert-committed"]
+     ["sub" "change" "version" "leiningen.release/bump-version" "release"]
+     ["sub" "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation:." "install"]
      ["changelog" "release"]
-     ["shell" "sed" "-E" "-i.bak" "s/\"[0-9]+\\.[0-9]+\\.[0-9]+\"/\"${:version}\"/g" "README.md"]
+     ["shell" "sed" "-E" "-i.bak" "s/liberator\\.mixin\\.(.+) \"[0-9]+\\.[0-9]+\\.[0-9]+\"/liberator\\.mixin.\\\\1 \"${:version}\"/g" "README.md"]
      ["shell" "rm" "-f" "README.md.bak"]
+     ["shell" "sed" "-E" "-i.bak" "s/liberator\\.mixin\\.(.+) \"[0-9]+\\.[0-9]+\\.[0-9]+\"/liberator\\.mixin.\\\\1 \"${:version}\"/g" "docs/01-getting-started.md"]
+     ["shell" "sed" "-E" "-i.bak" "s/liberator\\.mixin\\.(.+) \"[0-9]+\\.[0-9]+\\.[0-9]+\"/liberator\\.mixin.\\\\1 \"${:version}\"/g" "docs/02-check-functions.md"]
+     ["shell" "rm" "-f" "docs/01-getting-started.md.bak"]
+     ["shell" "rm" "-f" "docs/02-check-functions.md.bak"]
+     ["codox"]
      ["shell" "git" "add" "."]
      ["vcs" "commit" "Release version %s [skip ci]"]
      ["vcs" "tag"]
-     ["deploy"]
-     ["change" "version" "leiningen.release/bump-version" "patch"]
-     ["change" "version" "leiningen.release/bump-version" "rc"]
-     ["change" "version" "leiningen.release/bump-version" "release"]
+     ["sub" "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation:." "deploy"]
+     ["sub" "change" "version" "leiningen.release/bump-version" "patch"]
+     ["sub" "change" "version" "leiningen.release/bump-version" "rc"]
+     ["sub" "change" "version" "leiningen.release/bump-version" "release"]
      ["vcs" "commit" "Pre-release version %s [skip ci]"]
      ["vcs" "tag"]
      ["vcs" "push"]]}}
 
-  :target-path "target/%s/"
-
-  :cloverage
-  {:ns-exclude-regex [#"^user"]}
+  :source-paths []
+  :test-paths []
+  :resource-paths []
 
   :codox
   {:namespaces  [#"^liberator\.mixin\."]
@@ -83,12 +103,34 @@
    :doc-paths   ["docs"]
    :source-uri  "https://github.com/logicblocks/liberator.mixin/blob/{version}/{filepath}#L{line}"}
 
-  :cljfmt {:indents ^:replace {#".*" [[:inner 0]]}}
+  :aliases {"install"
+            ["do"
+             ["sub"
+              "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+              "install"]
+             ["install"]]
 
-  :eastwood {:config-files ["config/linter.clj"]}
+            "eastwood"
+            ["sub"
+             "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+             "eastwood"]
 
-  :bikeshed {:name-collisions false}
+            "cljfmt"
+            ["sub"
+             "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+             "cljfmt"]
 
-  :deploy-repositories
-  {"releases"  {:url "https://repo.clojars.org" :creds :gpg}
-   "snapshots" {:url "https://repo.clojars.org" :creds :gpg}})
+            "kibit"
+            ["sub"
+             "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+             "kibit"]
+
+            "check"
+            ["sub"
+             "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+             "check"]
+
+            "bikeshed"
+            ["sub"
+             "-s" "core:context:logging:json:authorisation:hypermedia:hal:validation"
+             "bikeshed"]})
