@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.hypermedia "0.1.0-RC2"
+(defproject io.logicblocks/liberator.mixin.hypermedia "0.1.0-RC3"
   :description "A hypermedia mixin for liberator."
 
   :parent-project {:path    "../parent/project.clj"
