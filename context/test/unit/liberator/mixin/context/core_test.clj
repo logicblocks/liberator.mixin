@@ -17,13 +17,13 @@
 
 (deftest with-attribute-in-context
   (testing "adds provided attribute to the context"
-    (let [routes [["/" :root]]
+    (let [router [["/" :root]]
           resource (core/build-resource
                      {:available-media-types ["application/json"]}
-                     (context/with-attribute-in-context :routes routes)
+                     (context/with-attribute-in-context :router router)
                      {:handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      (fn [{:keys [router]}]
+                        router)})
           response (call-resource
                      resource
                      (ring/request :get "/"))]
@@ -31,7 +31,7 @@
 
 (deftest with-attributes-in-context
   (testing "adds provided attributes to the context"
-    (let [routes [["/" :root]]
+    (let [router [["/" :root]]
           database (let [state (atom {})]
                      {:put     (fn [[key value]]
                                  (swap! state assoc key value))
@@ -39,15 +39,15 @@
           resource (core/build-resource
                      {:available-media-types ["application/json"]}
                      (context/with-attributes-in-context
-                       :routes routes
+                       :router router
                        :database database)
                      {:handle-ok
-                      (fn [{:keys [routes database request]}]
+                      (fn [{:keys [router database request]}]
                         (let [{:keys [get-all put]} database
                               query-string (get request :query-string)
                               query-param (string/split query-string #"=")]
                           (put query-param)
-                          [routes (get-all)]))})
+                          [router (get-all)]))})
           response-1 (call-resource
                        resource
                        (ring/request :get "/" {"key1" "value1"}))

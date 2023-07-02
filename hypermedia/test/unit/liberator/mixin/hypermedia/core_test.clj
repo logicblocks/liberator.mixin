@@ -33,3 +33,21 @@
       (is (=
             self-link
             (get-in response [:body :self]))))))
+
+(deftest with-router-in-context
+  (testing "adds router from dependencies to context"
+    (let [router ["" [["/" :root]]]
+          resource (core/build-resource
+                     (json/with-json-media-type)
+                     (hypermedia/with-router-in-context
+                       {:router router})
+                     {:handle-ok
+                      (fn [{:keys [router]}]
+                        {:router router})})
+          response (call-resource
+                     resource
+                     (ring/header
+                       (ring/request :get "/")
+                       :accept json/json-media-type))]
+      (is (= ["" [["/" "root"]]]
+            (get-in response [:body :router]))))))

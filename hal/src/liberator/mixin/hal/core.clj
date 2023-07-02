@@ -8,10 +8,16 @@
     - Adds `application/hal+json` as a supported media type.
     - Adds support for JSON serialisation for maps and seqs for the HAL
       media type.
-    - Adds support for [halboy](https://github.com/jimmythompson/halboy)
+    - Adds support for [halboy](https://github.com/logicblocks/halboy)
       resource serialisation.
-    - Adds a default handler responding with an empty HAL resource for
-      `:handle-not-found`.
+    - Adds a default handler for `:handle-exception` which logs the exception
+      when a logger conforming to [[liberator.mixin.logging.core/Logger]] is
+      present in the `context` at `:logger` and responds with a HAL resource
+      that does not disclose details of the exception but does give it an ID for
+      debugging purposes.
+    - Adds default handlers responding with an empty HAL resource for
+      `:handle-not-found`, `:handle-unauthorized`, `:handle-forbidden` and
+      `:handle-method-not-allowed`.
     - Adds a HAL error representation for use with the
       [[liberator.mixin.validation.core|validation mixin]].
 
@@ -34,12 +40,13 @@
 
   ### halboy `Resource` support
 
-  The [halboy](https://github.com/jimmythompson/halboy) resource support
-  will add a `:discovery` link to any returned resource and expects `bidi`
-  `:routes` to be available in the `context`, containing a route named
+  The [halboy](https://github.com/logicblocks/halboy) resource support
+  will add a `:discovery` link to any returned resource and expects a
+  `:router` supported by [hype](https://github.com/logicblocks/hype) to be
+  available in the `context`, containing a route named
   `:discovery`. The [[liberator.mixin.hypermedia.core|hypermedia mixin]] adds
-  routes to the `context` so nothing further is needed if that mixin is in use."
-  (:refer-clojure :exclude [random-uuid])
+  a router to the `context` so nothing further is needed if that mixin is in
+  use."
   (:require
    [halboy.resource :as hal]
    [liberator.representation :as r]
@@ -51,11 +58,10 @@
    [liberator.mixin.logging.core :as log]
    [jason.convenience :as jason-conv])
   (:import
-   [halboy.resource Resource]
-   [java.util UUID]))
+   [halboy.resource Resource]))
 
-(defn- random-uuid []
-  (str (UUID/randomUUID)))
+(defn- random-uuid-string []
+  (str (random-uuid)))
 
 (def hal-media-type
   "The HAL media type string."
@@ -63,11 +69,11 @@
 
 (extend-protocol r/Representation
   Resource
-  (as-response [data {:keys [request routes] :as context}]
+  (as-response [data {:keys [request router] :as context}]
     (r/as-response
       (-> data
         (hal/add-link :discovery
-          (hype/absolute-url-for request routes :discovery))
+          (hype/absolute-url-for request router :discovery))
         (haljson/resource->map))
       context)))
 
@@ -111,7 +117,7 @@
   []
   {:handle-exception
    (fn [{:keys [exception resource]}]
-     (let [error-id (random-uuid)
+     (let [error-id (random-uuid-string)
            message "Request caused an exception"]
        (when-let [get-logger (:logger resource)]
          (log/log-error (get-logger) message

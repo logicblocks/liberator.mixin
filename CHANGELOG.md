@@ -12,6 +12,17 @@ and this project adheres to
 
 - Forked from `b-social/liberator-mixin`.
 - Rename library to `liberator.mixin`
+- Rename `:routes` to `:router` in `liberator.mixin.hal` and
+  `liberator.mixin.hypermedia` to reflect upstream changes in `hype`.
+- Switch to a multimodule build with the core mixin logic implemented by 
+  `liberator.mixin.core` and the specific mixins moved respectively to:
+  - `liberator.mixin.authorisation`
+  - `liberator.mixin.context`
+  - `liberator.mixin.hal`
+  - `liberator.mixin.hypermedia`
+  - `liberator.mixin.json`
+  - `liberator.mixin.logging`
+  - `liberator.mixin.validation`
 
 ## [0.0.61] — 2023-01-10
 

@@ -15,14 +15,15 @@
    [liberator.mixin.hypermedia.core :as hypermedia]
    [liberator.mixin.hal.core :as hal]))
 
-(deftype TestLogger [state]
-         log/Logger
-         (log-error [_ message context cause]
-           (reset!
-             state
-             {:message message
-              :context context
-              :cause   cause})))
+(deftype TestLogger
+  [state]
+  log/Logger
+  (log-error [_ message context cause]
+    (reset!
+      state
+      {:message message
+       :context context
+       :cause   cause})))
 
 (defn new-test-logger [state]
   (->TestLogger state))
@@ -159,7 +160,8 @@
 (deftest with-not-found-handler
   (testing "provides a sensible default when the resource does not exist"
     (let [resource (core/build-resource
-                     (hypermedia/with-hypermedia-mixin)
+                     (hypermedia/with-hypermedia-mixin
+                       {:router ["" [["/" :discovery]]]})
                      (json/with-json-mixin)
                      (hal/with-hal-media-type)
                      (hal/with-not-found-handler)
@@ -176,7 +178,8 @@
 (deftest with-exception-handler
   (let [log-state-atom (atom {})
         resource (core/build-resource
-                   (hypermedia/with-hypermedia-mixin)
+                   (hypermedia/with-hypermedia-mixin
+                     {:router ["" [["/" :discovery]]]})
                    (json/with-json-mixin)
                    (hal/with-hal-media-type)
                    (hal/with-exception-handler)
@@ -204,7 +207,8 @@
 
 (deftest with-unauthorized-handler
   (let [resource (core/build-resource
-                   (hypermedia/with-hypermedia-mixin)
+                   (hypermedia/with-hypermedia-mixin
+                     {:router ["" [["/" :discovery]]]})
                    (json/with-json-mixin)
                    (hal/with-hal-media-type)
                    (hal/with-unauthorized-handler)
@@ -221,7 +225,8 @@
 
 (deftest with-forbidden-handler
   (let [resource (core/build-resource
-                   (hypermedia/with-hypermedia-mixin)
+                   (hypermedia/with-hypermedia-mixin
+                     {:router ["" [["/" :discovery]]]})
                    (json/with-json-mixin)
                    (hal/with-hal-media-type)
                    (hal/with-forbidden-handler)
@@ -238,7 +243,8 @@
 
 (deftest with-method-not-allowed-handler
   (let [resource (core/build-resource
-                   (hypermedia/with-hypermedia-mixin)
+                   (hypermedia/with-hypermedia-mixin
+                     {:router ["" [["/" :discovery]]]})
                    (json/with-json-mixin)
                    (hal/with-hal-media-type)
                    (hal/with-method-not-allowed-handler)

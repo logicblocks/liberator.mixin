@@ -26,9 +26,7 @@
             (auth/with-jws-access-token-mixin)
             {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
              :token-key        (fn [_] "foo")
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -49,9 +47,7 @@
             {:token-validators  [(auth/->ScopeValidator {:get #{"read"}})]
              :token-key         (fn [_] "foo")
              :token-header-name (fn [& _] "x-auth-jwt")
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok         (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -73,10 +69,8 @@
                                    :post #{"write"}})]
              :token-key        "foo"
              :allowed-methods  [:get :post]
-             :handle-ok        (fn [{:keys [routes]}]
-                                 routes)
-             :handle-created   (fn [{:keys [routes]}]
-                                 routes)})
+             :handle-ok        (fn [_] {:status :success})
+             :handle-created   (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -106,9 +100,7 @@
             {:token-validators [(auth/->ScopeValidator {:get #{"read"}}),
                                 (FailedValidator.)]
              :token-key        "foo"
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -133,9 +125,7 @@
                                   {:get #{"write"}}),
                                 (FailedValidator.)]
              :token-key        "foo"
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -158,9 +148,7 @@
             (auth/with-jws-access-token-mixin)
             {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
              :token-key        "foo"
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -180,9 +168,7 @@
             {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
              :token-type       "Token"
              :token-key        "foo"
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -206,9 +192,7 @@
                                    (codecs/b64->bytes)
                                    (codecs/bytes->str)))
              :token-key        "foo"
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -229,9 +213,7 @@
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      :handle-ok (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -253,10 +235,8 @@
                                    :post #{"not-write"}})]
              :token-key        "foo"
              :allowed-methods  [:get :post]
-             :handle-ok        (fn [{:keys [routes]}]
-                                 routes)
-             :handle-created   (fn [{:keys [routes]}]
-                                 routes)})
+             :handle-ok        (fn [_] {:status :success})
+             :handle-created   (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -294,9 +274,7 @@
             (auth/with-jws-access-token-mixin)
             {:token-validators [(auth/->ScopeValidator {:get #{"read"}})]
              :token-key        "foo"
-             :handle-ok
-             (fn [{:keys [routes]}]
-               routes)})
+             :handle-ok        (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -316,9 +294,7 @@
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      :handle-ok (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -339,9 +315,7 @@
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-required? {:any false}
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      :handle-ok       (fn [_] {:status :success})})
           request (ring/request :get "/")
           response (call-resource
                      resource
@@ -356,12 +330,8 @@
                      {:token-required? {:post true
                                         :get  false}
                       :allowed-methods [:post :get]
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)
-                      :handle-created
-                      (fn [{:keys [routes]}]
-                        routes)})]
+                      :handle-ok       (fn [_] {:status :success})
+                      :handle-created  (fn [_] {:status :success})})]
       (is (= 200 (:status (call-resource
                             resource
                             (ring/request :get "/")))))
@@ -375,9 +345,7 @@
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      :handle-ok (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
@@ -398,9 +366,7 @@
                      (json/with-json-media-type)
                      (auth/with-jws-access-token-mixin)
                      {:token-key "foo"
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      :handle-ok (fn [_] {:status :success})})
           request (ring/request :get "/")
           expiry-time (t/long (t/<< (t/now) (t/new-duration 5 :minutes)))
           request (ring/header
@@ -421,9 +387,7 @@
                      (auth/with-jws-access-token-mixin)
                      {:token-key     "foo"
                       :token-options {:aud "pms.com"}
-                      :handle-ok
-                      (fn [{:keys [routes]}]
-                        routes)})
+                      :handle-ok     (fn [_] {:status :success})})
           request (ring/request :get "/")
           request (ring/header
                     request
