@@ -23,6 +23,9 @@ and this project adheres to
   - `liberator.mixin.json`
   - `liberator.mixin.logging`
   - `liberator.mixin.validation`
+- The `liberator.mixin.logging` mixin now expects a `cartus.core/Logger` rather
+  than implementing a custom protocol for logging. The `liberator.mixin.hal`
+  mixin has also been updated to use `cartus.core` for logging.
 
 ## [0.0.61] — 2023-01-10
 

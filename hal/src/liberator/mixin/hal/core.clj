@@ -11,10 +11,10 @@
     - Adds support for [halboy](https://github.com/logicblocks/halboy)
       resource serialisation.
     - Adds a default handler for `:handle-exception` which logs the exception
-      when a logger conforming to [[liberator.mixin.logging.core/Logger]] is
-      present in the `context` at `:logger` and responds with a HAL resource
-      that does not disclose details of the exception but does give it an ID for
-      debugging purposes.
+      when a logger implementing [[cartus.core/Logger]] is present on the
+      `resource` at `:logger` and responds with a HAL resource that does not
+      disclose details of the exception but does give it an ID for debugging
+      purposes.
     - Adds default handlers responding with an empty HAL resource for
       `:handle-not-found`, `:handle-unauthorized`, `:handle-forbidden` and
       `:handle-method-not-allowed`.
@@ -48,14 +48,15 @@
   a router to the `context` so nothing further is needed if that mixin is in
   use."
   (:require
-   [halboy.resource :as hal]
    [liberator.representation :as r]
 
+   [cartus.core :as cc]
+
+   [halboy.resource :as hal]
    [halboy.json :as haljson]
 
    [hype.core :as hype]
 
-   [liberator.mixin.logging.core :as log]
    [jason.convenience :as jason-conv])
   (:import
    [halboy.resource Resource]))
@@ -119,14 +120,16 @@
    (fn [{:keys [exception resource]}]
      (let [error-id (random-uuid-string)
            message "Request caused an exception"]
-       (when-let [get-logger (:logger resource)]
-         (log/log-error (get-logger) message
+       (when-let [logger-fn (:logger resource)]
+         (cc/error (logger-fn)
+           :request/unhandled-exception
            {:error-id error-id}
-           exception))
+           {:message   message
+            :exception exception}))
        (hal/add-properties
          (hal/new-resource)
          {:error-id error-id
-          :message message})))})
+          :message  message})))})
 
 (defn with-not-found-handler []
   {:handle-not-found

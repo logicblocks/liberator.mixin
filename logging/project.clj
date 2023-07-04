@@ -19,9 +19,12 @@
 
   :plugins [[lein-parent "0.3.8"]]
 
-  :dependencies []
+  :dependencies [[io.logicblocks/cartus.core]
+                 [io.logicblocks/cartus.null]]
 
   :profiles {:shared {:dependencies [[io.logicblocks/liberator.mixin.core]
+
+                                     [io.logicblocks/cartus.test]
 
                                      [io.logicblocks/jason]
 

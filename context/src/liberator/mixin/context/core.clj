@@ -3,7 +3,7 @@
 
 (defn with-attribute-in-context
   "Returns a mixin that adds an attribute with specified `value` to the context
-  map at `key` for all requests.
+  map at `key` for all requests.ccc
 
   This mixin can be used multiple times for different attributes."
   [key value]

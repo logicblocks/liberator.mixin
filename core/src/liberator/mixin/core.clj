@@ -98,7 +98,7 @@
   "Merges together two liberator handlers, `left` and `right`.
 
   Currently, the `left` handler is discarded and the `right` is used in its
-  place. In future, this may be improved such that some aspect of the `left`
+  place. In the future, this may be improved such that some aspect of the `left`
   handler is retained."
   [left right]
   ; TODO: Can we do better than this

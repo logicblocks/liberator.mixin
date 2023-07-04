@@ -21,7 +21,7 @@
 
   :dependencies [[liberator]
 
-                 [io.logicblocks/liberator.mixin.logging]
+                 [io.logicblocks/cartus.core]
 
                  [io.logicblocks/jason]
                  [io.logicblocks/halboy]
@@ -30,6 +30,8 @@
   :profiles {:shared {:dependencies [[io.logicblocks/liberator.mixin.core]
                                      [io.logicblocks/liberator.mixin.json]
                                      [io.logicblocks/liberator.mixin.hypermedia]
+
+                                     [io.logicblocks/cartus.test]
 
                                      [camel-snake-kebab]
 
