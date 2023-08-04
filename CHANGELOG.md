@@ -26,6 +26,8 @@ and this project adheres to
 - The `liberator.mixin.logging` mixin now expects a `cartus.core/Logger` rather
   than implementing a custom protocol for logging. The `liberator.mixin.hal`
   mixin has also been updated to use `cartus.core` for logging.
+- Fix issue where merging mixins with duplicated decisions e.g. `allowed?` would duplicate
+  values in sequential collections of the context.
 
 ## [0.0.61] — 2023-01-10
 
