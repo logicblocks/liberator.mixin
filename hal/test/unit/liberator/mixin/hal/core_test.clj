@@ -1,20 +1,20 @@
 (ns liberator.mixin.hal.core-test
   (:require
-    [clojure.test :refer :all]
+   [clojure.test :refer :all]
 
-    [cartus.test :refer [logged?] :as ct]
+   [cartus.test :refer [logged?] :as ct]
 
-    [ring.mock.request :as ring]
+   [ring.mock.request :as ring]
 
-    [jason.core :as jason]
-    [jason.convenience :as jason-conv]
+   [jason.core :as jason]
+   [jason.convenience :as jason-conv]
 
-    [camel-snake-kebab.core :refer [->snake_case_string]]
+   [camel-snake-kebab.core :refer [->snake_case_string]]
 
-    [liberator.mixin.core :as core]
-    [liberator.mixin.json.core :as json]
-    [liberator.mixin.hypermedia.core :as hypermedia]
-    [liberator.mixin.hal.core :as hal]))
+   [liberator.mixin.core :as core]
+   [liberator.mixin.json.core :as json]
+   [liberator.mixin.hypermedia.core :as hypermedia]
+   [liberator.mixin.hal.core :as hal]))
 
 (defn call-resource [resource request]
   (->
