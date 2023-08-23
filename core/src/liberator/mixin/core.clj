@@ -62,21 +62,36 @@
   the `right` decision will see any context updates made by the `left`."
   [left right comparator]
   (fn [context]
-    (letfn [(if-vector? [thing f]
+    (letfn [(if-vector?
+              [thing f]
               (if (vector? thing) (f thing) thing))
-            (execute-and-update [[result context] f]
-              (let [decision (f context)
-                    comparison (if (nil? result)
-                                 (if-vector? decision first)
-                                 (comparator result
-                                   (if-vector? decision first)))
-                    result (boolean comparison)
-                    context-update (if-vector? decision second)
-                    context (liberator/update-context context context-update)]
-                [result context]))]
-      (-> [nil context]
+
+            (decision->context-update
+              [result]
+              (cond (vector? result) (second result)
+                    (map? result) result
+                    :else nil))
+
+            (execute-and-update
+              [{:keys [current-context current-result]} f]
+              (let [[current-decision current-context-update] current-result
+                    result (f current-context)
+                    decision (if-vector? result first)
+                    comparison (if (nil? current-decision)
+                                 decision
+                                 (comparator current-decision decision))
+                    context-update (decision->context-update result)
+                    new-decision (boolean comparison)
+                    new-context-update (liberator/update-context current-context-update context-update)
+                    new-context (liberator/update-context current-context context-update)]
+                {:current-result [new-decision new-context-update]
+                 :current-context new-context}))]
+
+      (-> {:current-result [nil nil]
+           :current-context context}
         (execute-and-update (liberator-util/make-function left))
-        (execute-and-update (liberator-util/make-function right))))))
+        (execute-and-update (liberator-util/make-function right))
+        (:current-result)))))
 
 (defn merge-actions
   "Merges together two liberator actions, `left` and `right`.
