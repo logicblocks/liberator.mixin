@@ -17,7 +17,7 @@
                              :cljfmt
                              :eastwood]}
 
-  :plugins [[lein-parent "0.3.8"]]
+  :plugins [[lein-parent "0.3.9"]]
 
   :dependencies [[liberator]]
 

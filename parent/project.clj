@@ -9,8 +9,8 @@
   {:name "The MIT License"
    :url  "https://opensource.org/licenses/MIT"}
 
-  :plugins [[io.logicblocks/lein-interpolate "0.1.1-RC2"]
-            [jonase/eastwood "1.4.0"]
+  :plugins [[io.logicblocks/lein-interpolate "0.1.1-RC3"]
+            [jonase/eastwood "1.4.2"]
             [lein-ancient "0.7.0"]
             [lein-bikeshed "0.5.2"]
             [lein-cljfmt "0.9.2"]
@@ -56,7 +56,7 @@
    [ring/ring-core "1.10.0"]
    [ring/ring-mock "0.4.0"]
 
-   [tick "0.6.2"]
+   [tick "0.7.5"]
 
    [eftest "0.6.0"]]
 
