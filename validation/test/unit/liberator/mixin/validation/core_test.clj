@@ -1,16 +1,16 @@
 (ns liberator.mixin.validation.core-test
   (:require
-   [clojure.test :refer :all]
-   [clojure.spec.alpha :as spec]
+    [clojure.test :refer :all]
+    [clojure.spec.alpha :as spec]
 
-   [ring.mock.request :as ring]
+    [ring.mock.request :as ring]
 
-   [jason.convenience :as jason-conv]
+    [jason.convenience :as jason-conv]
 
-   [liberator.util :refer [by-method]]
-   [liberator.mixin.core :as core]
-   [liberator.mixin.json.core :as json]
-   [liberator.mixin.validation.core :as validation]))
+    [liberator.util :refer [by-method]]
+    [liberator.mixin.core :as core]
+    [liberator.mixin.json.core :as json]
+    [liberator.mixin.validation.core :as validation]))
 
 (defn assert-valid-context [context]
   (when-not (:request context)
@@ -259,7 +259,16 @@
             (validation/map->SpecBackedValidator
               {:spec ::test-spec})]
         (is (= false (validation/valid? validator
-                       {::test-attribute-1 123}))))))
+                       {::test-attribute-1 123})))))
+
+    (testing "uses specified selector when provided"
+      (let [validator
+            (validation/map->SpecBackedValidator
+              {:spec        ::test-spec
+               :selector-fn first})]
+        (is (= true (validation/valid? validator
+                      [{::test-attribute-1 "hello"
+                        ::test-attribute-2 123}]))))))
 
   (testing "problems"
     (testing "returns no problems when spec is satisfied by context"
@@ -285,7 +294,20 @@
                  :subject      :test-spec
                  :type         :invalid}]
               (validation/problems validator
-                {::test-attribute-1 123})))))))
+                {::test-attribute-1 123})))))
+
+    (testing "uses specified selector when provided"
+      (let [validator
+            (validation/map->SpecBackedValidator
+              {:spec        ::test-spec
+               :selector-fn first})]
+        (is (= [{:field
+                 [:liberator.mixin.validation.core-test/test-attribute-2]
+                 :requirements [:must-be-present]
+                 :subject      :test-spec
+                 :type         :missing}]
+              (validation/problems validator
+                [{::test-attribute-1 "hello"}])))))))
 
 (deftest validator
   (testing "assumes function backed validator when no type is passed"

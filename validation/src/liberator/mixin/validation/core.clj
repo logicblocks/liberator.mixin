@@ -1,6 +1,6 @@
 (ns liberator.mixin.validation.core
   (:require
-   [spec.validate.core :as sv-core]))
+    [spec.validate.core :as sv-core]))
 
 ;; coercion should be a separate mixin
 ;; it should happen post validation
@@ -16,12 +16,18 @@
   (problems [_ context] (problems-fn context)))
 
 (defrecord SpecBackedValidator
-  [spec]
+  [spec selector-fn]
   Validator
   (valid? [_ context]
-    ((sv-core/validator spec) context))
+    (let [v (sv-core/validator spec)
+          s (or selector-fn identity)
+          t (s context)]
+      (v t)))
   (problems [_ context]
-    ((sv-core/problem-calculator spec) context)))
+    (let [pc (sv-core/problem-calculator spec)
+          s (or selector-fn identity)
+          t (s context)]
+      (pc t))))
 
 (defrecord MultiValidator
   [validators]
