@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.hal "0.1.0-RC8"
+(defproject io.logicblocks/liberator.mixin.hal "0.1.0-RC9"
   :description "A HAL mixin for liberator."
 
   :parent-project {:path    "../parent/project.clj"
