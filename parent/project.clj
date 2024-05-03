@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.parent "0.1.0-RC7"
+(defproject io.logicblocks/liberator.mixin.parent "0.1.0-RC8"
   :scm {:dir  "."
         :name "git"
         :url  "https://github.com/logicblocks/liberator.mixin"}
