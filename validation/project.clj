@@ -19,7 +19,8 @@
 
   :plugins [[lein-parent "0.3.9"]]
 
-  :dependencies [[liberator]]
+  :dependencies [[liberator]
+                 [io.logicblocks/spec.validate]]
 
   :profiles {:shared {:dependencies [[io.logicblocks/liberator.mixin.core]
                                      [io.logicblocks/liberator.mixin.json]

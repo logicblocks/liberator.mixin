@@ -1,22 +1,54 @@
 (ns liberator.mixin.validation.core
-  (:refer-clojure :exclude [random-uuid])
-  (:import
-   [java.util UUID]))
+  (:require
+   [spec.validate.core :as sv-core]))
 
-(defn- random-uuid []
-  (str (UUID/randomUUID)))
+;; coercion should be a separate mixin
+;; it should happen post validation
 
 (defprotocol Validator
   (valid? [_ m])
-  (problems-for [_ m]))
+  (problems [_ m]))
 
-(defrecord FnBackedValidator [valid-fn problems-for-fn]
-           Validator
-           (valid? [_ context] (valid-fn context))
-           (problems-for [_ context] (problems-for-fn context)))
+(defrecord FnBackedValidator
+  [valid-fn problems-fn]
+  Validator
+  (valid? [_ context] (valid-fn context))
+  (problems [_ context] (problems-fn context)))
 
-(defn validator [& {:as options}]
+(defrecord SpecBackedValidator
+  [spec]
+  Validator
+  (valid? [_ context]
+    ((sv-core/validator spec) context))
+  (problems [_ context]
+    ((sv-core/problem-calculator spec) context)))
+
+(defrecord MultiValidator
+  [validators]
+  Validator
+  (valid? [_ m]
+    (every? #(valid? % m) validators))
+  (problems [_ m]
+    (reduce
+      (fn [p v]
+        (into p (problems v m)))
+      (problems (first validators) m)
+      (rest validators))))
+
+(defmulti validator
+  (fn [& {:as options}]
+    (:type options)))
+
+(defmethod validator :spec
+  [& {:as options}]
+  (map->SpecBackedValidator options))
+
+(defmethod validator :default
+  [& {:as options}]
   (map->FnBackedValidator options))
+
+(defn combine [first second & rest]
+  (->MultiValidator (into [first second] rest)))
 
 (defn with-validation []
   {:validate-methods
@@ -43,7 +75,7 @@
                {:error-id error-id :error-context error-context}))
 
            error-id (random-uuid)
-           error-context (problems-for (new-validator context) context)]
+           error-context (problems (new-validator context) context)]
        (new-error-representation
          (assoc context
            :error-id error-id
