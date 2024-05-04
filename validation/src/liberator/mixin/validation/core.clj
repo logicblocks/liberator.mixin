@@ -16,18 +16,23 @@
   (problems [_ context] (problems-fn context)))
 
 (defrecord SpecBackedValidator
-  [spec selector-fn problem-transformer-fn]
+  [spec selector-fn problem-subject-fn problem-transformer-fn]
   Validator
   (valid? [_ context]
-    (let [v (sv-core/validator spec)
-          s (or selector-fn identity)
-          t (s context)]
+    (let [s (or selector-fn identity)
+          t (s context)
+          v (sv-core/validator spec)]
       (v t)))
   (problems [_ context]
-    (let [pc (sv-core/problem-calculator spec
-               :problem-transformer (or problem-transformer-fn identity))
-          s (or selector-fn identity)
-          t (s context)]
+    (let [s (or selector-fn identity)
+          t (s context)
+          pc (sv-core/problem-calculator spec
+               :validation-subject
+               (if (fn? problem-subject-fn)
+                 (problem-subject-fn spec t)
+                 (keyword (name spec)))
+               :problem-transformer
+               (or problem-transformer-fn identity))]
       (pc t))))
 
 (defrecord MultiValidator

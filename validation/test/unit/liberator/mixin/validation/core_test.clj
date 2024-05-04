@@ -309,7 +309,7 @@
               (validation/problems validator
                 [{::test-attribute-1 "hello"}])))))
 
-    (testing "uses specific transformer when provided"
+    (testing "uses specified transformer when provided"
       (let [validator
             (validation/map->SpecBackedValidator
               {:spec ::test-spec
@@ -327,6 +327,25 @@
                  :subject :test-spec
                  :problem :invalid
                  :field   "test-attribute-1"}]
+              (validation/problems validator
+                {::test-attribute-1 123})))))
+    (testing "uses specified subject function when provided"
+      (let [validator
+            (validation/map->SpecBackedValidator
+              {:spec ::test-spec
+               :problem-subject-fn
+               (fn [spec value]
+                 (str (name spec) "-" (::test-attribute-1 value)))})]
+        (is (= [{:field
+                 [:liberator.mixin.validation.core-test/test-attribute-2]
+                 :requirements [:must-be-present]
+                 :subject      "test-spec-123"
+                 :type         :missing}
+                {:field
+                 [:liberator.mixin.validation.core-test/test-attribute-1]
+                 :requirements [:must-be-valid]
+                 :subject      "test-spec-123"
+                 :type         :invalid}]
               (validation/problems validator
                 {::test-attribute-1 123})))))))
 
@@ -369,8 +388,9 @@
           (validation/spec-validator ::test-spec))))
   (testing "passes selector-fn when creating spec backed validator"
     (let [selector-fn #(get-in % [:some :thing])]
-      (is (= (validation/spec-validator ::test-spec
-               {:selector-fn selector-fn})
+      (is (= (validation/map->SpecBackedValidator
+               {:spec        ::test-spec
+                :selector-fn selector-fn})
             (validation/spec-validator ::test-spec
               {:selector-fn selector-fn})))))
   (testing "passes problem-transformer-fn when creating spec backed validator"
@@ -380,7 +400,17 @@
              :subject subject
              :problem type
              :field   (name (first field))})]
-      (is (= (validation/spec-validator ::test-spec
-               {:problem-transformer-fn problem-transformer-fn})
+      (is (= (validation/map->SpecBackedValidator
+               {:spec                   ::test-spec
+                :problem-transformer-fn problem-transformer-fn})
             (validation/spec-validator ::test-spec
-              {:problem-transformer-fn problem-transformer-fn}))))))
+              {:problem-transformer-fn problem-transformer-fn})))))
+  (testing "passes problem-subject-fn when creating spec backed validator"
+    (let [problem-subject-fn
+          (fn [spec value]
+            (str (name spec) "-" (:id value)))]
+      (is (= (validation/map->SpecBackedValidator
+               {:spec               ::test-spec
+                :problem-subject-fn problem-subject-fn})
+            (validation/spec-validator ::test-spec
+              {:problem-subject-fn problem-subject-fn}))))))
