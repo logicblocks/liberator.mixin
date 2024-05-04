@@ -1,16 +1,16 @@
 (ns liberator.mixin.validation.core-test
   (:require
-    [clojure.test :refer :all]
-    [clojure.spec.alpha :as spec]
+   [clojure.test :refer :all]
+   [clojure.spec.alpha :as spec]
 
-    [ring.mock.request :as ring]
+   [ring.mock.request :as ring]
 
-    [jason.convenience :as jason-conv]
+   [jason.convenience :as jason-conv]
 
-    [liberator.util :refer [by-method]]
-    [liberator.mixin.core :as core]
-    [liberator.mixin.json.core :as json]
-    [liberator.mixin.validation.core :as validation]))
+   [liberator.util :refer [by-method]]
+   [liberator.mixin.core :as core]
+   [liberator.mixin.json.core :as json]
+   [liberator.mixin.validation.core :as validation]))
 
 (defn assert-valid-context [context]
   (when-not (:request context)
@@ -307,53 +307,80 @@
                  :subject      :test-spec
                  :type         :missing}]
               (validation/problems validator
-                [{::test-attribute-1 "hello"}])))))))
+                [{::test-attribute-1 "hello"}])))))
+
+    (testing "uses specific transformer when provided"
+      (let [validator
+            (validation/map->SpecBackedValidator
+              {:spec ::test-spec
+               :problem-transformer-fn
+               (fn [{:keys [subject type field]}]
+                 {:type    :validation-failure
+                  :subject subject
+                  :problem type
+                  :field   (name (first field))})})]
+        (is (= [{:type    :validation-failure
+                 :subject :test-spec
+                 :problem :missing
+                 :field   "test-attribute-2"}
+                {:type    :validation-failure
+                 :subject :test-spec
+                 :problem :invalid
+                 :field   "test-attribute-1"}]
+              (validation/problems validator
+                {::test-attribute-1 123})))))))
 
 (deftest validator
   (testing "assumes function backed validator when no type is passed"
-    (let [valid-call (atom nil)
-          problems-call (atom nil)
-          validator
-          (validation/validator
-            :valid-fn (partial reset! valid-call)
-            :problems-fn (partial reset! problems-call))]
-      (validation/valid? validator {:some :context})
-      (validation/problems validator {:some :context})
-
-      (is (= {:some :context} @valid-call))
-      (is (= {:some :context} @problems-call))))
+    (let [valid-fn (constantly true)
+          problems-fn (constantly [])]
+      (is (= (validation/map->FnBackedValidator
+               {:valid-fn    valid-fn
+                :problems-fn problems-fn})
+            (validation/validator
+              :valid-fn valid-fn
+              :problems-fn problems-fn)))))
 
   (testing "returns spec backed validator when type is spec"
-    (let [validator
-          (validation/validator
-            :type :spec
-            :spec ::test-spec)
-
-          valid (validation/valid? validator {::test-attribute-1 123})
-          problems (validation/problems validator {::test-attribute-1 123})]
-      (is (false? valid))
-      (is (= [{:field
-               [:liberator.mixin.validation.core-test/test-attribute-2]
-               :requirements [:must-be-present]
-               :subject      :test-spec
-               :type         :missing}
-              {:field
-               [:liberator.mixin.validation.core-test/test-attribute-1]
-               :requirements [:must-be-valid]
-               :subject      :test-spec
-               :type         :invalid}]
-            problems))))
+    (let [selector-fn #(get-in % [:some :thing])]
+      (is (= (validation/map->SpecBackedValidator
+               {:spec        ::test-spec
+                :selector-fn selector-fn})
+            (validation/validator
+              :type :spec
+              :spec ::test-spec
+              :selector-fn selector-fn)))))
 
   (testing "returns function backed validator when type is fn"
-    (let [valid-call (atom nil)
-          problems-call (atom nil)
-          validator
-          (validation/validator
-            :type :fn
-            :valid-fn (partial reset! valid-call)
-            :problems-fn (partial reset! problems-call))]
-      (validation/valid? validator {:some :context})
-      (validation/problems validator {:some :context})
+    (let [valid-fn (constantly true)
+          problems-fn (constantly [])]
+      (is (= (validation/map->FnBackedValidator
+               {:valid-fn    valid-fn
+                :problems-fn problems-fn})
+            (validation/validator
+              :type :fn
+              :valid-fn valid-fn
+              :problems-fn problems-fn))))))
 
-      (is (= {:some :context} @valid-call))
-      (is (= {:some :context} @problems-call)))))
+(deftest spec-validator
+  (testing "returns spec backed validator"
+    (is (= (validation/map->SpecBackedValidator
+             {:spec ::test-spec})
+          (validation/spec-validator ::test-spec))))
+  (testing "passes selector-fn when creating spec backed validator"
+    (let [selector-fn #(get-in % [:some :thing])]
+      (is (= (validation/spec-validator ::test-spec
+               {:selector-fn selector-fn})
+            (validation/spec-validator ::test-spec
+              {:selector-fn selector-fn})))))
+  (testing "passes problem-transformer-fn when creating spec backed validator"
+    (let [problem-transformer-fn
+          (fn [{:keys [subject type field]}]
+            {:type    :validation-failure
+             :subject subject
+             :problem type
+             :field   (name (first field))})]
+      (is (= (validation/spec-validator ::test-spec
+               {:problem-transformer-fn problem-transformer-fn})
+            (validation/spec-validator ::test-spec
+              {:problem-transformer-fn problem-transformer-fn}))))))
