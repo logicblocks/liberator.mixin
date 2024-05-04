@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.logging "0.1.0-RC9"
+(defproject io.logicblocks/liberator.mixin.logging "0.1.0-RC10"
   :description "A logging mixin for liberator."
 
   :parent-project {:path    "../parent/project.clj"
