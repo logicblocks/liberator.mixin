@@ -24,12 +24,12 @@
 
 (defn new-mock-validator [valid-response problems-response]
   (validation/validator
-    :valid-fn
+    :valid?
     (fn [context]
       (assert-valid-context context)
       valid-response)
 
-    :problems-fn
+    :problems
     (fn [context]
       (assert-valid-context context)
       problems-response)))
@@ -193,48 +193,48 @@
 
 (deftest function-backed-validator
   (testing "valid?"
-    (testing "passes context to :valid-fn"
+    (testing "passes context to :valid?"
       (let [arg-store (atom nil)
             validator
             (validation/map->FnBackedValidator
-              {:valid-fn    (fn [context] (reset! arg-store context))
-               :problems-fn (fn [_] [])})
+              {:valid?   (fn [context] (reset! arg-store context))
+               :problems (fn [_] [])})
             context {:first  1
                      :second 2}]
         (validation/valid? validator context)
         (is (= context @arg-store))))
 
-    (testing "returns true when :valid-fn returns true"
+    (testing "returns true when :valid? returns true"
       (let [validator
             (validation/map->FnBackedValidator
-              {:valid-fn    (fn [_] true)
-               :problems-fn (fn [_] [])})]
+              {:valid?   (fn [_] true)
+               :problems (fn [_] [])})]
         (is (= true (validation/valid? validator {})))))
 
-    (testing "returns false when :valid-fn returns false"
+    (testing "returns false when :valid? returns false"
       (let [validator
             (validation/map->FnBackedValidator
-              {:valid-fn    (fn [_] false)
-               :problems-fn (fn [_] [])})]
+              {:valid?   (fn [_] false)
+               :problems (fn [_] [])})]
         (is (= false (validation/valid? validator {}))))))
 
   (testing "problems"
-    (testing "passes context to :problems-fn"
+    (testing "passes context to :problems"
       (let [arg-store (atom nil)
             validator
             (validation/map->FnBackedValidator
-              {:valid-fn    (fn [_] false)
-               :problems-fn (fn [context] (reset! arg-store context))})
+              {:valid?   (fn [_] false)
+               :problems (fn [context] (reset! arg-store context))})
             context {:first  1
                      :second 2}]
         (validation/problems validator context)
         (is (= context @arg-store))))
 
-    (testing "returns problems returned by :problems-fn"
+    (testing "returns problems returned by :problems"
       (let [validator
             (validation/map->FnBackedValidator
-              {:valid-fn    (fn [_] true)
-               :problems-fn (fn [_] [{:first 1} {:second 2}])})]
+              {:valid?   (fn [_] true)
+               :problems (fn [_] [{:first 1} {:second 2}])})]
         (is (= [{:first 1} {:second 2}]
               (validation/problems validator {})))))))
 
@@ -264,8 +264,8 @@
     (testing "uses specified selector when provided"
       (let [validator
             (validation/map->SpecBackedValidator
-              {:spec        ::test-spec
-               :selector-fn first})]
+              {:spec     ::test-spec
+               :selector first})]
         (is (= true (validation/valid? validator
                       [{::test-attribute-1 "hello"
                         ::test-attribute-2 123}]))))))
@@ -299,8 +299,8 @@
     (testing "uses specified selector when provided"
       (let [validator
             (validation/map->SpecBackedValidator
-              {:spec        ::test-spec
-               :selector-fn first})]
+              {:spec     ::test-spec
+               :selector first})]
         (is (= [{:field
                  [:liberator.mixin.validation.core-test/test-attribute-2]
                  :requirements [:must-be-present]
@@ -313,7 +313,7 @@
       (let [validator
             (validation/map->SpecBackedValidator
               {:spec ::test-spec
-               :problem-transformer-fn
+               :problem-transformer
                (fn [{:keys [subject type field]}]
                  {:type    :validation-failure
                   :subject subject
@@ -333,7 +333,7 @@
       (let [validator
             (validation/map->SpecBackedValidator
               {:spec ::test-spec
-               :problem-subject-fn
+               :problem-subject
                (fn [spec value]
                  (str (name spec) "-" (::test-attribute-1 value)))})]
         (is (= [{:field
@@ -351,50 +351,50 @@
 
 (deftest validator
   (testing "assumes function backed validator when no type is passed"
-    (let [valid-fn (constantly true)
-          problems-fn (constantly [])]
+    (let [valid (constantly true)
+          problems (constantly [])]
       (is (= (validation/map->FnBackedValidator
-               {:valid-fn    valid-fn
-                :problems-fn problems-fn})
+               {:valid?   valid
+                :problems problems})
             (validation/validator
-              :valid-fn valid-fn
-              :problems-fn problems-fn)))))
+              :valid? valid
+              :problems problems)))))
 
   (testing "returns spec backed validator when type is spec"
-    (let [selector-fn #(get-in % [:some :thing])]
+    (let [selector #(get-in % [:some :thing])]
       (is (= (validation/map->SpecBackedValidator
-               {:spec        ::test-spec
-                :selector-fn selector-fn})
+               {:spec     ::test-spec
+                :selector selector})
             (validation/validator
               :type :spec
               :spec ::test-spec
-              :selector-fn selector-fn)))))
+              :selector selector)))))
 
   (testing "returns function backed validator when type is fn"
-    (let [valid-fn (constantly true)
-          problems-fn (constantly [])]
+    (let [valid (constantly true)
+          problems (constantly [])]
       (is (= (validation/map->FnBackedValidator
-               {:valid-fn    valid-fn
-                :problems-fn problems-fn})
+               {:valid?   valid
+                :problems problems})
             (validation/validator
               :type :fn
-              :valid-fn valid-fn
-              :problems-fn problems-fn))))))
+              :valid? valid
+              :problems problems))))))
 
 (deftest spec-validator
   (testing "returns spec backed validator"
     (is (= (validation/map->SpecBackedValidator
              {:spec ::test-spec})
           (validation/spec-validator ::test-spec))))
-  (testing "passes selector-fn when creating spec backed validator"
-    (let [selector-fn #(get-in % [:some :thing])]
+  (testing "passes selector when creating spec backed validator"
+    (let [selector #(get-in % [:some :thing])]
       (is (= (validation/map->SpecBackedValidator
-               {:spec        ::test-spec
-                :selector-fn selector-fn})
+               {:spec     ::test-spec
+                :selector selector})
             (validation/spec-validator ::test-spec
-              {:selector-fn selector-fn})))))
-  (testing "passes problem-transformer-fn when creating spec backed validator"
-    (let [problem-transformer-fn
+              {:selector selector})))))
+  (testing "passes problem-transformer when creating spec backed validator"
+    (let [problem-transformer
           (fn [{:keys [subject type field]}]
             {:type    :validation-failure
              :subject subject
@@ -402,15 +402,15 @@
              :field   (name (first field))})]
       (is (= (validation/map->SpecBackedValidator
                {:spec                   ::test-spec
-                :problem-transformer-fn problem-transformer-fn})
+                :problem-transformer problem-transformer})
             (validation/spec-validator ::test-spec
-              {:problem-transformer-fn problem-transformer-fn})))))
-  (testing "passes problem-subject-fn when creating spec backed validator"
-    (let [problem-subject-fn
+              {:problem-transformer problem-transformer})))))
+  (testing "passes problem-subject when creating spec backed validator"
+    (let [problem-subject
           (fn [spec value]
             (str (name spec) "-" (:id value)))]
       (is (= (validation/map->SpecBackedValidator
                {:spec               ::test-spec
-                :problem-subject-fn problem-subject-fn})
+                :problem-subject problem-subject})
             (validation/spec-validator ::test-spec
-              {:problem-subject-fn problem-subject-fn}))))))
+              {:problem-subject problem-subject}))))))

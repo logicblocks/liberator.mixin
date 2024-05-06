@@ -35,4 +35,6 @@
              :unit   [:parent-unit :shared]}
 
   :test-paths ["test/unit"]
-  :resource-paths [])
+  :resource-paths []
+
+  :eastwood {:exclude-linters [:local-shadows-var]})
