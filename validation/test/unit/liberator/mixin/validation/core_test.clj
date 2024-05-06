@@ -401,16 +401,16 @@
              :problem type
              :field   (name (first field))})]
       (is (= (validation/map->SpecBackedValidator
-               {:spec                   ::test-spec
-                :problem-transformer problem-transformer})
+               {:spec        ::test-spec
+                :transformer problem-transformer})
             (validation/spec-validator ::test-spec
-              {:problem-transformer problem-transformer})))))
+              {:transformer problem-transformer})))))
   (testing "passes problem-subject when creating spec backed validator"
     (let [problem-subject
           (fn [spec value]
             (str (name spec) "-" (:id value)))]
       (is (= (validation/map->SpecBackedValidator
-               {:spec               ::test-spec
-                :problem-subject problem-subject})
+               {:spec    ::test-spec
+                :subject problem-subject})
             (validation/spec-validator ::test-spec
-              {:problem-subject problem-subject}))))))
+              {:subject problem-subject}))))))

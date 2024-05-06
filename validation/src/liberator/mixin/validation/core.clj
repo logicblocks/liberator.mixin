@@ -27,12 +27,8 @@
     (let [s (or selector identity)
           t (s context)
           pc (sv-core/problem-calculator spec
-               :validation-subject
-               (if (fn? problem-subject)
-                 (problem-subject spec t)
-                 (keyword (name spec)))
-               :problem-transformer
-               (or problem-transformer identity))]
+               :subject problem-subject
+               :transformer problem-transformer)]
       (pc t))))
 
 (defrecord MultiValidator

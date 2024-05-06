@@ -40,7 +40,7 @@
    [io.logicblocks/jason "1.0.0"]
    [io.logicblocks/halboy "6.0.0"]
    [io.logicblocks/hype "2.0.0"]
-   [io.logicblocks/spec.validate "0.2.0-RC17"]
+   [io.logicblocks/spec.validate "0.2.0-RC19"]
 
    [io.logicblocks/cartus.core "0.1.18"]
    [io.logicblocks/cartus.test "0.1.18"]
