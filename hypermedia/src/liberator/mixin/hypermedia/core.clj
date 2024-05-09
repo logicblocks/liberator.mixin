@@ -5,8 +5,8 @@
 (defn with-self-link []
   {:initialize-context
    (fn [{:keys [resource] :as context}]
-     (when-let [self-link (:self resource)]
-       {:self (self-link context)}))})
+     (when-let [self-link (:self-link resource)]
+       {:self-link (self-link context)}))})
 
 (defn with-router-in-context [dependencies]
   (with-attributes-in-context

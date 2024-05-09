@@ -21,10 +21,10 @@
           resource (core/build-resource
                      (json/with-json-media-type)
                      (hypermedia/with-self-link)
-                     {:self (constantly self-link)
+                     {:self-link (constantly self-link)
                       :handle-ok
-                      (fn [{:keys [self]}]
-                        {:self self})})
+                      (fn [{:keys [self-link]}]
+                        {:self self-link})})
           response (call-resource
                      resource
                      (ring/header

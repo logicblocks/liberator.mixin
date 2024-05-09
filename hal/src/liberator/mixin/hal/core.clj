@@ -99,13 +99,13 @@
   `liberator.mixin.validation` when they need to render errors.
 
   The error representation factory function expects the context to include
-  a `:self` href, an `:error-id` and an `:error-context` used in the resulting
-  representation."
+  a `:self-link` value/function, an `:error-id` and an `:error-context` used
+  in the resulting representation."
   []
   {:error-representation
-   (fn [{:keys [self error-id error-context]}]
+   (fn [{:keys [self-link error-id error-context]}]
      (->
-       (hal/new-resource self)
+       (hal/new-resource self-link)
        (hal/add-property :error-id error-id)
        (hal/add-property :error-context error-context)))})
 
