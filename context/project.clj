@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.context "0.1.0-RC12"
+(defproject io.logicblocks/liberator.mixin.context "0.1.0-RC13"
   :description "A context management mixin for liberator."
 
   :parent-project {:path    "../parent/project.clj"
