@@ -13,32 +13,32 @@
    [liberator.core :as liberator]
    [liberator.util :as liberator-util]))
 
-(defn is-decision?
+(defn decision?
   "Returns `true` if `k`, a keyword, represents a liberator decision, `false`
   otherwise."
   [k]
   (str/ends-with? (name k) "?"))
 
-(defn is-action?
+(defn action?
   "Returns `true` if `k`, a keyword, represents a liberator action, `false`
   otherwise."
   [k]
   (or (= k :initialize-context) (str/ends-with? (name k) "!")))
 
-(defn is-handler?
+(defn handler?
   "Returns `true` if `k`, a keyword, represents a liberator handler, `false`
   otherwise."
   [k]
   (str/starts-with? (name k) "handle"))
 
-(defn is-configuration?
+(defn configuration?
   "Return `true` if `k`, a keyword, represents a liberator configuration
   parameter, `false` otherwise."
   [k]
   (let [n (name k)]
     (or
       (= k :patch-content-types)
-      (and (not (is-decision? k))
+      (and (not (decision? k))
         (or
           (str/starts-with? n "available")
           (str/starts-with? n "allowed")
@@ -82,8 +82,11 @@
                                  (comparator current-decision decision))
                     context-update (decision->context-update result)
                     new-decision (boolean comparison)
-                    new-context-update (liberator/update-context current-context-update context-update)
-                    new-context (liberator/update-context current-context context-update)]
+                    new-context-update
+                    (liberator/update-context
+                      current-context-update context-update)
+                    new-context
+                    (liberator/update-context current-context context-update)]
                 {:current-result [new-decision new-context-update]
                  :current-context new-context}))]
 
@@ -208,13 +211,13 @@
           (let [current (get result k)]
             (assoc result
               k (cond
-                  (is-decision? k) (merge-decisions
-                                     current
-                                     override
-                                     (get-comparator k))
-                  (is-action? k) (merge-actions current override)
-                  (is-handler? k) (merge-handlers current override)
-                  (is-configuration? k) (merge-configurations current override)
+                  (decision? k) (merge-decisions
+                                  current
+                                  override
+                                  (get-comparator k))
+                  (action? k) (merge-actions current override)
+                  (handler? k) (merge-handlers current override)
+                  (configuration? k) (merge-configurations current override)
                   :else override)))
           (assoc result k override)))
       {}

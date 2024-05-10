@@ -21,10 +21,12 @@
 
   :dependencies [[liberator]]
 
-  :profiles {:shared      {:dependencies []}
-             :reveal      [:parent-reveal]
-             :dev         [:parent-dev :shared]
-             :unit        [:parent-unit :shared]}
+  :profiles {:shared {:dependencies
+                      [[ring/ring-core]
+                       [ring/ring-mock]]}
+             :reveal [:parent-reveal]
+             :dev    [:parent-dev :shared]
+             :unit   [:parent-unit :shared]}
 
   :test-paths ["test/unit"]
   :resource-paths [])

@@ -15,28 +15,28 @@
 
 (deftest type-checks
   (doseq [decision-name (concat ts/decision-names-and ts/decision-names-or)]
-    (is (true? (core/is-decision? decision-name)))
-    (is (false? (core/is-action? decision-name)))
-    (is (false? (core/is-handler? decision-name)))
-    (is (false? (core/is-configuration? decision-name))))
+    (is (true? (core/decision? decision-name)))
+    (is (false? (core/action? decision-name)))
+    (is (false? (core/handler? decision-name)))
+    (is (false? (core/configuration? decision-name))))
 
   (doseq [handler-name ts/handler-names]
-    (is (false? (core/is-decision? handler-name)))
-    (is (false? (core/is-action? handler-name)))
-    (is (true? (core/is-handler? handler-name)))
-    (is (false? (core/is-configuration? handler-name))))
+    (is (false? (core/decision? handler-name)))
+    (is (false? (core/action? handler-name)))
+    (is (true? (core/handler? handler-name)))
+    (is (false? (core/configuration? handler-name))))
 
   (doseq [action-name ts/action-names]
-    (is (false? (core/is-decision? action-name)))
-    (is (true? (core/is-action? action-name)))
-    (is (false? (core/is-handler? action-name)))
-    (is (false? (core/is-configuration? action-name))))
+    (is (false? (core/decision? action-name)))
+    (is (true? (core/action? action-name)))
+    (is (false? (core/handler? action-name)))
+    (is (false? (core/configuration? action-name))))
 
   (doseq [configuration-name ts/configuration-names]
-    (is (false? (core/is-decision? configuration-name)))
-    (is (false? (core/is-action? configuration-name)))
-    (is (false? (core/is-handler? configuration-name)))
-    (is (true? (core/is-configuration? configuration-name)))))
+    (is (false? (core/decision? configuration-name)))
+    (is (false? (core/action? configuration-name)))
+    (is (false? (core/handler? configuration-name)))
+    (is (true? (core/configuration? configuration-name)))))
 
 (defn liberator-fn? [f]
   (or (fn? f)
