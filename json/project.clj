@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.json "0.1.0-RC13"
+(defproject io.logicblocks/liberator.mixin.json "0.1.0-RC14"
   :description "A JSON mixin for liberator."
 
   :parent-project {:path    "../parent/project.clj"
