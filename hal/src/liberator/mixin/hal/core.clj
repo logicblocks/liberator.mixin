@@ -125,7 +125,7 @@
            :request/unhandled-exception
            {:error-id error-id}
            {:message   message
-            :exception exception}))
+            :exception (Throwable->map exception)}))
        (hal/add-properties
          (hal/new-resource)
          {:error-id error-id

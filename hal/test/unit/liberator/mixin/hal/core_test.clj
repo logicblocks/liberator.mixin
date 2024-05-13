@@ -180,7 +180,7 @@
 
 (deftest with-exception-handler-logs-when-logger-on-resource
   (let [logger (ct/logger)
-        exception (ex-info "Something went wrong" {})
+        exception (ex-info "Something went wrong" {:some :data})
         resource (core/build-resource
                    (hypermedia/with-hypermedia-mixin
                      {:router ["" [["/" :discovery]]]})
@@ -189,16 +189,19 @@
                    (hal/with-exception-handler)
                    {:logger    (constantly logger)
                     :handle-ok (fn [_] (throw exception))})]
+
     (call-resource
       resource
       (ring/header
         (ring/request :get "/")
         :accept hal/hal-media-type))
 
+    (clojure.pprint/pprint (Throwable->map exception))
+
     (is (logged? logger
           {:level     :error
            :type      :request/unhandled-exception
-           :exception exception
+           :exception (Throwable->map exception)
            :message   "Request caused an exception"
            :context   {:error-id some?}}))))
 

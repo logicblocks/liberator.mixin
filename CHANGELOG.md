@@ -26,8 +26,39 @@ and this project adheres to
 - The `liberator.mixin.logging` mixin now expects a `cartus.core/Logger` rather
   than implementing a custom protocol for logging. The `liberator.mixin.hal`
   mixin has also been updated to use `cartus.core` for logging.
-- Fix issue where merging mixins with duplicated decisions e.g. `allowed?` would duplicate
-  values in sequential collections of the context.
+- When logging exceptions in `liberator.mixin.hal/with-exception-handler`, the
+  exception is first converted to a map using `clojure.core/Throwable->map` in
+  order to retain detail.
+- The resource key `:self` introduced as part of the 
+  `liberator.mixin.hypermedia` mixin has been renamed to `:self-link` for 
+  clarity and the corresponding `:self` entry added to context has been 
+  renamed to `:self-link`. 
+- The `is-` prefix on predicates in `liberator.mixin.core` has been dropped to
+  follow convention.
+
+### Added
+
+- A new `SpecBackedValidator` has been added to `liberator.mixin.validation`
+  allowing a spec to be used as a validator, along with a function 
+  `spec-validator` to assist in construction of the validator.
+- A new `MultiValidator` and supporting `combine` function has been added to
+  `liberator.mixin.validation` allowing validators to be combined such that all
+  validators must report valid in order for the combined to report valid and
+  such that problems from all validators are combined in the combined validator.
+- Two helpers, `resource-attribute-as-value` and `resource-attribute-as-fn`, for 
+  fetching resource attributes from context, have been added in
+  `liberator.mixin.util`.
+  - `resource-attribute-as-value` fetches the attribute from the resource and 
+    invokes it passing context, returning the result.
+  - `resource-attribute-as-fn` fetches the attribute from the resource and
+    partially applies it using the context, returning a function of the 
+    remaining parameters
+- 
+
+### Fixed
+
+- Fix issue where merging mixins with duplicated decisions e.g. `allowed?` would
+  duplicate values in sequential collections of the context.
 
 ## [0.0.61] — 2023-01-10
 
