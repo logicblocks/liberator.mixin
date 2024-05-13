@@ -196,14 +196,11 @@
         (ring/request :get "/")
         :accept hal/hal-media-type))
 
-    (clojure.pprint/pprint (Throwable->map exception))
-
     (is (logged? logger
           {:level     :error
-           :type      :request/unhandled-exception
-           :exception (Throwable->map exception)
-           :message   "Request caused an exception"
-           :context   {:error-id some?}}))))
+           :type      :service.rest/request.exception.unhandled
+           :context   {:error-id some?
+                       :exception (Throwable->map exception)}}))))
 
 (deftest with-unauthorized-handler-responds-401-unauthorized-when-unauthorized
   (let [resource (core/build-resource

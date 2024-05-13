@@ -122,9 +122,8 @@
            message "Request caused an exception"]
        (when-let [logger-fn (:logger resource)]
          (cc/error (logger-fn)
-           :request/unhandled-exception
-           {:error-id error-id}
-           {:message   message
+           :service.rest/request.exception.unhandled
+           {:error-id  error-id
             :exception (Throwable->map exception)}))
        (hal/add-properties
          (hal/new-resource)
