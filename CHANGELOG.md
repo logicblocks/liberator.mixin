@@ -53,7 +53,9 @@ and this project adheres to
   - `resource-attribute-as-fn` fetches the attribute from the resource and
     partially applies it using the context, returning a function of the 
     remaining parameters
-- 
+  - The `liberator-mixin.hal` namespace now includes a
+    `with-malformed-handler` mixin for correctly handling malformed responses as
+    a HAL resource.
 
 ### Fixed
 
