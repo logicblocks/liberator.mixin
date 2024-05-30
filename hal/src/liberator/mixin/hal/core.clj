@@ -154,6 +154,14 @@
        (hal/new-resource)
        {:error forbidden-message}))})
 
+(defn with-malformed-handler []
+  {:handle-malformed
+   (fn [{:keys [malformed-message]
+         :or   {malformed-message "Malformed"}}]
+     (hal/add-properties
+       (hal/new-resource)
+       {:error malformed-message}))})
+
 (defn with-method-not-allowed-handler []
   {:handle-method-not-allowed
    (fn [{:keys [method-not-allowed-message]
@@ -169,4 +177,5 @@
    (with-not-found-handler)
    (with-unauthorized-handler)
    (with-forbidden-handler)
+   (with-malformed-handler)
    (with-method-not-allowed-handler)])

@@ -252,3 +252,39 @@
     (is (= 405 (:status response)))
     (is (= "Method not allowed"
           (get-in response [:body :error])))))
+
+(deftest with-malformed-handler-responds-400-not-allows-when-bad-method
+  (testing "Default message"
+    (let [resource (core/build-resource
+                     (hypermedia/with-hypermedia-mixin
+                       {:router ["" [["/" :discovery]]]})
+                     (json/with-json-mixin)
+                     (hal/with-hal-media-type)
+                     (hal/with-malformed-handler)
+                     {:malformed? (constantly true)
+                      :handle-ok (constantly {:status "OK"})})
+          response (call-resource
+                     resource
+                     (ring/header
+                       (ring/request :get "/" {})
+                       :accept hal/hal-media-type))]
+      (is (= 400 (:status response)))
+      (is (= "Malformed"
+            (get-in response [:body :error])))))
+  (testing "Custom malformed message"
+    (let [resource (core/build-resource
+                     (hypermedia/with-hypermedia-mixin
+                       {:router ["" [["/" :discovery]]]})
+                     (json/with-json-mixin)
+                     (hal/with-hal-media-type)
+                     (hal/with-malformed-handler)
+                     {:malformed? (constantly [true {:malformed-message "OH NO"}])
+                      :handle-ok (constantly {:status "OK"})})
+          response (call-resource
+                     resource
+                     (ring/header
+                       (ring/request :get "/" {})
+                       :accept hal/hal-media-type))]
+      (is (= 400 (:status response)))
+      (is (= "OH NO"
+            (get-in response [:body :error]))))))
