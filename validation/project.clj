@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.validation "0.1.0-RC19"
+(defproject io.logicblocks/liberator.mixin.validation "0.1.0-RC20"
   :description "A validation mixin for liberator."
 
   :parent-project {:path    "../parent/project.clj"

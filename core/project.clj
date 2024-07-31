@@ -1,4 +1,4 @@
-(defproject io.logicblocks/liberator.mixin.core "0.1.0-RC19"
+(defproject io.logicblocks/liberator.mixin.core "0.1.0-RC20"
   :description "Functions for defining composable liberator mixins."
 
   :parent-project {:path    "../parent/project.clj"
